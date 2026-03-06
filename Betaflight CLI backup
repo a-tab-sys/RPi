@@ -1,0 +1,43 @@
+# diff all
+
+# version
+# Betaflight / IFLIGHT_BLITZ_F722 (IFLIGHT_BLITZ_F722) 4.2.11 Dec  8 2021 / 15:41:30 () MSP API: 1.43
+
+# start the command batch
+batch start
+
+# reset configuration to default settings
+defaults nosave
+
+board_name IFLIGHT_BLITZ_F722
+manufacturer_id IFRC
+mcu_id 002d001e5632500820303236
+signature 
+
+profile 0
+
+profile 1
+
+profile 2
+
+# restore original profile selection
+profile 0
+
+rateprofile 0
+
+rateprofile 1
+
+rateprofile 2
+
+rateprofile 3
+
+rateprofile 4
+
+rateprofile 5
+
+# restore original rateprofile selection
+rateprofile 0
+
+# save configuration
+save
+# 
