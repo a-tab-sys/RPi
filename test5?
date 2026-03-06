@@ -1,0 +1,55 @@
+import serial
+import struct
+import time
+
+# Initialize serial - timeout should be small for high-speed streaming
+ser = serial.Serial('/dev/ttyS0', 115200, timeout=0.01)
+time.sleep(1) 
+
+def send_msp_rc(channels):
+    header = b'$M<'
+    size = len(channels) * 2
+    msg_id = 200 
+    payload = struct.pack('<' + 'H' * len(channels), *channels)
+    checksum = size ^ msg_id
+    for b in payload: 
+        checksum ^= b
+    packet = header + struct.pack('<BB', size, msg_id) + payload + struct.pack('<B', checksum)
+    ser.write(packet)
+    ser.flush()
+
+# Define our three states
+DISARMED = [1500, 1500, 1500, 1000, 1000, 1000, 1500, 1500]
+ARMED    = [1500, 1500, 1500, 1000, 2000, 1000, 1500, 1500]
+ANGLE    = [1500, 1500, 1500, 1000, 2000, 2000, 1500, 1500]
+
+try:
+    print("Streaming at 50Hz... Checking for RXLOSS clearance.")
+    start_time = time.time()
+    
+    while True:
+        elapsed = time.time() - start_time
+        
+        # Switch states based on time without stopping the loop
+        if elapsed < 3:
+            current_channels = DISARMED
+            state_name = "DISARMED"
+        elif elapsed < 6:
+            current_channels = ARMED
+            state_name = "ARMED"
+        elif elapsed < 9:
+            current_channels = ANGLE
+            state_name = "ARMED + ANGLE"
+        else:
+            start_time = time.time() # Reset cycle
+            continue
+
+        # Send the packet
+        send_msp_rc(current_channels)
+        
+        # CRITICAL: 0.02s delay creates a 50Hz RX Rate
+        time.sleep(0.02) 
+
+except KeyboardInterrupt:
+    send_msp_rc([1500, 1500, 1500, 1000, 1000, 1000, 1000, 1000])
+    ser.close()
