@@ -1,0 +1,40 @@
+import serial
+import struct
+import time
+
+# UART setup for Blitz F745 (Standard is 115200 for MSP)
+ser = serial.Serial('/dev/ttyS0', 115200, timeout=1)
+
+def send_msp_rc(channels):
+    header = b'$M<'
+    size = len(channels) * 2
+    msg_id = 200 # MSP_SET_RAW_RC
+    payload = struct.pack('<' + 'H' * len(channels), *channels)
+    checksum = size ^ msg_id
+    for b in payload: checksum ^= b
+    packet = header + struct.pack('<BB', size, msg_id) + payload + struct.pack('<B', checksum)
+    ser.write(packet)
+
+try:
+    while True:
+        # STATE 1: DISARMED
+        print("State: Disarmed")
+        # [R, P, Y, T, AUX1, AUX2...]
+        send_msp_rc([1500, 1500, 1500, 1000, 1000, 1000, 1500, 1500])
+        time.sleep(3)
+
+        # STATE 2: ARMED (Acro)
+        # Throttle MUST be 1000 to transition to Armed
+        print("State: Armed (Manual/Acro)")
+        send_msp_rc([1500, 1500, 1500, 1000, 2000, 1000, 1500, 1500])
+        time.sleep(3)
+
+        # STATE 3: ARMED + ANGLE MODE
+        print("State: Armed + Angle Mode (Auto-Level)")
+        send_msp_rc([1500, 1500, 1500, 1000, 2000, 2000, 1500, 1500])
+        time.sleep(3)
+
+except KeyboardInterrupt:
+    # Safety: Hard disarm on exit
+    send_msp_rc([1500, 1500, 1500, 1000, 1000, 1000, 1000, 1000])
+    ser.close()
