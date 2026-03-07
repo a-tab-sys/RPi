@@ -37,12 +37,12 @@ def send_msp_rc(channels):
     # Write to the serial buffer
     ser.write(packet)
 
-# Define Channel Lists [Roll, Pitch, Yaw, Throttle, AUX1, AUX2, AUX3, AUX4]
+# Define Channel Lists [Roll, Pitch, Throttle, Yaw, AUX1, AUX2, AUX3, AUX4]
 # AUX1 is typically used for ARMing (1800-2000 = Armed)
 # AUX2 is typically used for ANGLE mode
-DISARMED_STATE = [1500, 1500, 1500, 1000, 1000, 1000, 1500, 1500]
-ARMED_STATE    = [1500, 1500, 1500, 1000, 2000, 1000, 1500, 1500]
-ANGLE_STATE    = [1500, 1500, 1500, 1000, 2000, 2000, 1500, 1500]
+DISARMED_STATE = [1500, 1500, 1000, 1500, 1000, 1000, 1500, 1500]
+ARMED_STATE    = [1500, 1500, 1000, 1500, 2000, 1000, 1500, 1500]
+ANGLE_STATE    = [1500, 1500, 1000, 1500, 2000, 2000, 1500, 1500]
 
 try:
     print("Initializing UART2 Connection...")
