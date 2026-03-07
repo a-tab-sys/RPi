@@ -1,0 +1,92 @@
+import serial
+import struct
+import time
+
+# --- CONFIGURATION ---
+# Use /dev/ttyS0 for Raspberry Pi GPIO pins (14/15)
+# Ensure Serial Console is DISABLED in raspi-config!
+ser = serial.Serial(
+    port='/dev/ttyS0',
+    baudrate=115200,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS,
+    timeout=0,         # Non-blocking read
+    write_timeout=0    # Non-blocking write
+)
+
+def send_msp_rc(channels):
+    """
+    Packs 8 channels into an MSP_SET_RAW_RC packet (ID 200).
+    Expected values: 1000 to 2000.
+    """
+    header = b'$M<'
+    size = len(channels) * 2  # 8 channels * 2 bytes = 16 bytes
+    msg_id = 200              # MSP_SET_RAW_RC
+    
+    # Pack as 8 unsigned shorts (H) in Little-Endian (<)
+    payload = struct.pack('<' + 'H' * len(channels), *channels)
+    
+    # Calculate Checksum: XOR of Size, Message ID, and all payload bytes
+    checksum = size ^ msg_id
+    for b in payload:
+        checksum ^= b
+        
+    packet = header + struct.pack('<BB', size, msg_id) + payload + struct.pack('<B', checksum)
+    
+    # Write to the serial buffer
+    ser.write(packet)
+
+# Define Channel Lists [Roll, Pitch, Yaw, Throttle, AUX1, AUX2, AUX3, AUX4]
+# AUX1 is typically used for ARMing (1800-2000 = Armed)
+# AUX2 is typically used for ANGLE mode
+DISARMED_STATE = [1500, 1500, 1500, 1000, 1000, 1000, 1500, 1500]
+ARMED_STATE    = [1500, 1500, 1500, 1000, 2000, 1000, 1500, 1500]
+ANGLE_STATE    = [1500, 1500, 1500, 1000, 2000, 2000, 1500, 1500]
+
+try:
+    print("Initializing UART2 Connection...")
+    time.sleep(2) # Stabilization delay
+    print("Streaming started at 50Hz. Press Ctrl+C to Disarm and Exit.")
+    
+    start_time = time.time()
+
+    while True:
+        loop_start = time.time()
+        elapsed = loop_start - start_time
+        
+        # LOGIC: Switch states every 3 seconds
+        # 0-3s: Disarmed | 3-6s: Armed (Acro) | 6-9s: Armed (Angle)
+        cycle_pos = elapsed % 9
+        
+        if cycle_pos < 3:
+            current_channels = DISARMED_STATE
+            state_label = "DISARMED"
+        elif cycle_pos < 6:
+            current_channels = ARMED_STATE
+            state_label = "ARMED (ACRO)"
+        else:
+            current_channels = ANGLE_STATE
+            state_label = "ARMED (ANGLE)"
+
+        # Send the packet to the Flight Controller
+        send_msp_rc(current_channels)
+        
+        # DEBUG: Print status every 1 second (approx every 50 loops)
+        if int(elapsed * 50) % 50 == 0:
+            print(f"Status: {state_label} | Channels: {current_channels[3:5]}")
+
+        # PRECISION TIMING: Target 50Hz (0.02s per loop)
+        # We subtract the time the code took to run from the sleep duration
+        time_to_sleep = 0.02 - (time.time() - loop_start)
+        if time_to_sleep > 0:
+            time.sleep(time_to_sleep)
+
+except KeyboardInterrupt:
+    print("\n[!] EMERGENCY STOP: Sending Disarm Command...")
+    # Send Disarm (AUX1 = 1000) and Zero Throttle
+    for _ in range(10): # Send multiple times to ensure it hits
+        send_msp_rc([1500, 1500, 1500, 1000, 1000, 1000, 1000, 1000])
+        time.sleep(0.01)
+    ser.close()
+    print("Serial port closed. Safe to unplug.")
