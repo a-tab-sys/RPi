@@ -16,10 +16,18 @@ import cv2
 import numpy
 print("Success! All libraries are found.")
 
+ERROR 2
+>>> %Run -c $EDITOR_CONTENT
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/atab-rpi/Documents/drone_control/lib/python3.13/site-packages/picamera2/__init__.py", line 4, in <module>
+    import libcamera
+ModuleNotFoundError: No module named 'libcamera'
 
 
 
-ERROR
+
+ERROR 1
 
 atab-rpi@atab-rpi:~ $ cd Documents
 atab-rpi@atab-rpi:~/Documents $ source drone_control/bin/activate
