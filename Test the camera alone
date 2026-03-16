@@ -8,6 +8,17 @@ cv2.imshow("test", frame)
 cv2.waitKey(3000)
 picam2.stop()
 
+
+
+
+import picamera2
+import cv2
+import numpy
+print("Success! All libraries are found.")
+
+
+
+
 ERROR
 
 atab-rpi@atab-rpi:~ $ cd Documents
