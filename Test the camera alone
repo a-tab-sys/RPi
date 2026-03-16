@@ -94,3 +94,19 @@ ERROR 3
 [0:41:16.349838780] [3961] ERROR RPI pipeline_base.cpp:1356 Camera frontend has timed out!
 [0:41:16.349860854] [3961] ERROR RPI pipeline_base.cpp:1357 Please check that your camera sensor connector is attached securely.
 [0:41:16.349879835] [3961] ERROR RPI pipeline_base.cpp:1358 Alternatively, try another cable and/or sensor.
+
+
+#------------------------------------
+
+ERROR 4
+(drone_control) atab-rpi@atab-rpi:~/Documents $ rpicam-hello
+[0:54:39.838201866] [4111]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+[0:54:39.887523259] [4114]  INFO IPAProxy ipa_proxy.cpp:180 Using tuning file /usr/share/libcamera/ipa/rpi/vc4/ov5647.json
+[0:54:39.893988676] [4114]  INFO Camera camera_manager.cpp:223 Adding camera '/base/soc/i2c0mux/i2c@1/ov5647@36' for pipeline handler rpi/vc4
+[0:54:39.894085898] [4114]  INFO RPI vc4.cpp:445 Registered camera /base/soc/i2c0mux/i2c@1/ov5647@36 to Unicam device /dev/media1 and ISP device /dev/media2
+[0:54:39.894122860] [4114]  INFO RPI pipeline_base.cpp:1117 Using configuration file '/usr/share/libcamera/pipeline/rpi/vc4/rpi_apps.yaml'
+Made X/EGL preview window
+[0:54:40.303419973] [4111]  INFO Camera camera.cpp:1020 Pipeline handler in use by another process
+ERROR: *** failed to acquire camera /base/soc/i2c0mux/i2c@1/ov5647@36 ***
+(drone_control) atab-rpi@atab-rpi:~/Documents $ 
+
