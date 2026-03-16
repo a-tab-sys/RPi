@@ -7,3 +7,52 @@ frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 cv2.imshow("test", frame)
 cv2.waitKey(3000)
 picam2.stop()
+
+ERROR
+
+atab-rpi@atab-rpi:~ $ cd Documents
+atab-rpi@atab-rpi:~/Documents $ source drone_control/bin/activate
+(drone_control) atab-rpi@atab-rpi:~/Documents $ pip install picamera2 opencv-python
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting picamera2
+  Downloading https://www.piwheels.org/simple/picamera2/picamera2-0.3.34-py3-none-any.whl (129 kB)
+Collecting opencv-python
+  Using cached opencv_python-4.13.0.92-cp37-abi3-manylinux_2_28_aarch64.whl.metadata (19 kB)
+Collecting numpy (from picamera2)
+  Downloading numpy-2.4.3-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl.metadata (6.6 kB)
+Collecting PiDNG (from picamera2)
+  Downloading pidng-4.0.9.tar.gz (21 kB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting piexif (from picamera2)
+  Downloading https://www.piwheels.org/simple/piexif/piexif-1.1.3-py2.py3-none-any.whl (20 kB)
+Collecting pillow (from picamera2)
+  Using cached pillow-12.1.1-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl.metadata (8.8 kB)
+Collecting simplejpeg (from picamera2)
+  Downloading simplejpeg-1.9.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (8.6 kB)
+Collecting videodev2 (from picamera2)
+  Downloading https://www.piwheels.org/simple/videodev2/videodev2-0.0.4-py3-none-any.whl (49 kB)
+Collecting python-prctl (from picamera2)
+  Downloading python-prctl-1.8.1.tar.gz (28 kB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... error
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [1 lines of output]
+      You need to install libcap development headers to build this module
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: subprocess-exited-with-error
+
+× Getting requirements to build wheel did not run successfully.
+│ exit code: 1
+╰─> See above for output.
+
+note: This error originates from a subprocess, and is likely not a problem with pip.
+
+
+
