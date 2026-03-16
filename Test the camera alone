@@ -23,6 +23,7 @@ python3 -m venv --system-site-packages --clear ~/Documents/drone_control
 #------------------------------------
 
 ERROR 2
+
 >>> %Run -c $EDITOR_CONTENT
 Traceback (most recent call last):
   File "<string>", line 1, in <module>
@@ -99,6 +100,7 @@ ERROR 3
 #------------------------------------
 
 ERROR 4
+
 (drone_control) atab-rpi@atab-rpi:~/Documents $ rpicam-hello
 [0:54:39.838201866] [4111]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
 [0:54:39.887523259] [4114]  INFO IPAProxy ipa_proxy.cpp:180 Using tuning file /usr/share/libcamera/ipa/rpi/vc4/ov5647.json
@@ -109,4 +111,46 @@ Made X/EGL preview window
 [0:54:40.303419973] [4111]  INFO Camera camera.cpp:1020 Pipeline handler in use by another process
 ERROR: *** failed to acquire camera /base/soc/i2c0mux/i2c@1/ov5647@36 ***
 (drone_control) atab-rpi@atab-rpi:~/Documents $ 
+
+#------------------------------------
+
+ERROR 5
+
+atab-rpi@atab-rpi:~ $ rpicam-hello
+[1:07:38.556389337] [4402]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+[1:07:38.634744062] [4405]  INFO IPAProxy ipa_proxy.cpp:180 Using tuning file /usr/share/libcamera/ipa/rpi/vc4/ov5647.json
+[1:07:38.641320278] [4405]  INFO Camera camera_manager.cpp:223 Adding camera '/base/soc/i2c0mux/i2c@1/ov5647@36' for pipeline handler rpi/vc4
+[1:07:38.641433240] [4405]  INFO RPI vc4.cpp:445 Registered camera /base/soc/i2c0mux/i2c@1/ov5647@36 to Unicam device /dev/media1 and ISP device /dev/media2
+[1:07:38.641472388] [4405]  INFO RPI pipeline_base.cpp:1117 Using configuration file '/usr/share/libcamera/pipeline/rpi/vc4/rpi_apps.yaml'
+Made X/EGL preview window
+Mode selection for 1296:972:12:P
+    SGBRG10_CSI2P,640x480/0 - Score: 3296
+    SGBRG10_CSI2P,1296x972/0 - Score: 1000
+    SGBRG10_CSI2P,1920x1080/0 - Score: 1349.67
+    SGBRG10_CSI2P,2592x1944/0 - Score: 1567
+Stream configuration adjusted
+[1:07:38.837147305] [4402]  INFO Camera camera.cpp:1215 configuring streams: (0) 1296x972-YUV420/sYCC (1) 1296x972-SGBRG10_CSI2P/RAW
+[1:07:38.837800300] [4405]  INFO RPI vc4.cpp:620 Sensor: /base/soc/i2c0mux/i2c@1/ov5647@36 - Selected sensor format: 1296x972-SGBRG10_1X10/RAW - Selected unicam format: 1296x972-pGAA/RAW
+[1:07:39.950530481] [4405]  WARN V4L2 v4l2_videodevice.cpp:2100 /dev/video0[10:cap]: Dequeue timer of 1000000.00us has expired!
+[1:07:39.950627017] [4405] ERROR RPI pipeline_base.cpp:1356 Camera frontend has timed out!
+[1:07:39.950638313] [4405] ERROR RPI pipeline_base.cpp:1357 Please check that your camera sensor connector is attached securely.
+[1:07:39.950648332] [4405] ERROR RPI pipeline_base.cpp:1358 Alternatively, try another cable and/or sensor.
+ERROR: Device timeout detected, attempting a restart!!!
+[1:07:41.060963028] [4405]  WARN V4L2 v4l2_videodevice.cpp:2100 /dev/video0[10:cap]: Dequeue timer of 1000000.00us has expired!
+[1:07:41.061047972] [4405] ERROR RPI pipeline_base.cpp:1356 Camera frontend has timed out!
+[1:07:41.061059176] [4405] ERROR RPI pipeline_base.cpp:1357 Please check that your camera sensor connector is attached securely.
+[1:07:41.061069750] [4405] ERROR RPI pipeline_base.cpp:1358 Alternatively, try another cable and/or sensor.
+ERROR: Device timeout detected, attempting a restart!!!
+[1:07:42.177219279] [4405]  WARN V4L2 v4l2_videodevice.cpp:2100 /dev/video0[10:cap]: Dequeue timer of 1000000.00us has expired!
+[1:07:42.177308408] [4405] ERROR RPI pipeline_base.cpp:1356 Camera frontend has timed out!
+[1:07:42.177320037] [4405] ERROR RPI pipeline_base.cpp:1357 Please check that your camera sensor connector is attached securely.
+[1:07:42.177330130] [4405] ERROR RPI pipeline_base.cpp:1358 Alternatively, try another cable and/or sensor.
+ERROR: Device timeout detected, attempting a restart!!!
+[1:07:43.293503325] [4405]  WARN V4L2 v4l2_videodevice.cpp:2100 /dev/video0[10:cap]: Dequeue timer of 1000000.00us has expired!
+[1:07:43.293592992] [4405] ERROR RPI pipeline_base.cpp:1356 Camera frontend has timed out!
+[1:07:43.293604436] [4405] ERROR RPI pipeline_base.cpp:1357 Please check that your camera sensor connector is attached securely.
+[1:07:43.293614251] [4405] ERROR RPI pipeline_base.cpp:1358 Alternatively, try another cable and/or sensor.
+ERROR: Device timeout detected, attempting a restart!!!
+
+
 
