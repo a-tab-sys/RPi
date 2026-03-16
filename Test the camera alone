@@ -8,13 +8,19 @@ cv2.imshow("test", frame)
 cv2.waitKey(3000)
 picam2.stop()
 
-
-
+#------------------------------------
 
 import picamera2
+import libcamera
 import cv2
 import numpy
-print("Success! All libraries are found.")
+print("works")
+
+#------------------------------------
+
+python3 -m venv --system-site-packages --clear ~/Documents/drone_control
+
+#------------------------------------
 
 ERROR 2
 >>> %Run -c $EDITOR_CONTENT
@@ -24,9 +30,7 @@ Traceback (most recent call last):
     import libcamera
 ModuleNotFoundError: No module named 'libcamera'
 
-
-python3 -m venv --system-site-packages --clear ~/Documents/drone_control
-
+#------------------------------------
 
 ERROR 1
 
@@ -74,5 +78,19 @@ error: subprocess-exited-with-error
 
 note: This error originates from a subprocess, and is likely not a problem with pip.
 
+#------------------------------------
 
+ERROR 3
 
+>>> %Run -c $EDITOR_CONTENT
+[0:41:15.153411950] [3953]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+[0:41:15.204288898] [3961]  INFO IPAProxy ipa_proxy.cpp:180 Using tuning file /usr/share/libcamera/ipa/rpi/vc4/ov5647.json
+[0:41:15.211688625] [3961]  INFO Camera camera_manager.cpp:223 Adding camera '/base/soc/i2c0mux/i2c@1/ov5647@36' for pipeline handler rpi/vc4
+[0:41:15.211804587] [3961]  INFO RPI vc4.cpp:445 Registered camera /base/soc/i2c0mux/i2c@1/ov5647@36 to Unicam device /dev/media1 and ISP device /dev/media2
+[0:41:15.211883994] [3961]  INFO RPI pipeline_base.cpp:1117 Using configuration file '/usr/share/libcamera/pipeline/rpi/vc4/rpi_apps.yaml'
+[0:41:15.224398117] [3953]  INFO Camera camera.cpp:1215 configuring streams: (0) 640x480-XBGR8888/sRGB (1) 640x480-SGBRG10_CSI2P/RAW
+[0:41:15.226299081] [3961]  INFO RPI vc4.cpp:620 Sensor: /base/soc/i2c0mux/i2c@1/ov5647@36 - Selected sensor format: 640x480-SGBRG10_1X10/RAW - Selected unicam format: 640x480-pGAA/RAW
+[0:41:16.349727911] [3961]  WARN V4L2 v4l2_videodevice.cpp:2100 /dev/video0[14:cap]: Dequeue timer of 1000000.00us has expired!
+[0:41:16.349838780] [3961] ERROR RPI pipeline_base.cpp:1356 Camera frontend has timed out!
+[0:41:16.349860854] [3961] ERROR RPI pipeline_base.cpp:1357 Please check that your camera sensor connector is attached securely.
+[0:41:16.349879835] [3961] ERROR RPI pipeline_base.cpp:1358 Alternatively, try another cable and/or sensor.
