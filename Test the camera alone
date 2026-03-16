@@ -152,7 +152,12 @@ ERROR: Device timeout detected, attempting a restart!!!
 [1:07:43.293614251] [4405] ERROR RPI pipeline_base.cpp:1358 Alternatively, try another cable and/or sensor.
 ERROR: Device timeout detected, attempting a restart!!!
 
+#------------------------------------
 
+ERROR 6
 
-
+atab-rpi@atab-rpi:~ $ rpicam-hello
+[0:05:42.492599370] [2165]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+Made X/EGL preview window
+ERROR: *** no cameras available ***
 
