@@ -1,0 +1,9 @@
+from picamera2 import Picamera2
+import cv2
+picam2 = Picamera2()
+picam2.start()
+frame = picam2.capture_array()
+frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+cv2.imshow("test", frame)
+cv2.waitKey(3000)
+picam2.stop()
