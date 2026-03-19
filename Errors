@@ -1,6 +1,7 @@
-//Falling back on HOG+SVM ratherthan using YOLOv8 so making sure YOLO ultralytics is installed in the enviroment 
+//Falling back on HOG+SVM rather than using YOLOv8 so making sure YOLO ultralytics is installed in the enviroment 
 //In terminal with env open ran pip3 install ultralytics
-//Got error because ultrlytics has a dependancy that im missing
+//Got dependency conflict" warning, but the very last line says: Successfully installed ... ultralytics-8.4.24
+//Pip complaining that you have a package called types-seaborn installed which really wants something called pandas-stubs, and it noticed you don't have it
 
 (drone_control) atab-rpi@atab-rpi:~/Documents $ pip3 install ultralytics
 Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
@@ -75,3 +76,13 @@ ERROR: pip's dependency resolver does not currently take into account all the pa
 types-seaborn 0.13.2 requires pandas-stubs, which is not installed.
 Successfully installed contourpy-1.3.3 cycler-0.12.1 filelock-3.25.2 fonttools-4.62.1 fsspec-2026.2.0 kiwisolver-1.5.0 matplotlib-3.10.8 mpmath-1.3.0 networkx-3.6.1 polars-1.39.2 polars-runtime-32-1.39.2 pyparsing-3.3.2 scipy-1.17.1 sympy-1.14.0 torch-2.10.0 torchvision-0.25.0 ultralytics-8.4.24 ultralytics-thop-2.0.18
 
+
+
+//Make sure that ultrlytics and torch is working
+import ultralytics
+from ultralytics import YOLO
+import torch
+
+print(f"Ultralytics version: {ultralytics.__version__}")
+print(f"Torch version: {torch.__version__}")
+print("Setup successful!")
