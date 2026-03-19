@@ -97,3 +97,19 @@ from ultralytics import YOLO
 model = YOLO("yolo26n.pt")
 model.export(format="ncnn")
 # This creates a folder called 'yolo26n_ncnn_model' in your working directory
+
+//using yolo26n from documentation
+
+from ultralytics import YOLO
+
+# Load a YOLO26n PyTorch model
+model = YOLO("yolo26n.pt")
+
+# Export the model to NCNN format
+model.export(format="ncnn")  # creates 'yolo26n_ncnn_model'
+
+# Load the exported NCNN model
+ncnn_model = YOLO("yolo26n_ncnn_model")
+
+# Run inference
+results = ncnn_model("https://ultralytics.com/images/bus.jpg")
