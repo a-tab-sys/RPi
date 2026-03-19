@@ -1,0 +1,77 @@
+//Falling back on HOG+SVM ratherthan using YOLOv8 so making sure YOLO ultralytics is installed in the enviroment 
+//In terminal with env open ran pip3 install ultralytics
+//Got error because ultrlytics has a dependancy that im missing
+
+(drone_control) atab-rpi@atab-rpi:~/Documents $ pip3 install ultralytics
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting ultralytics
+  Downloading ultralytics-8.4.24-py3-none-any.whl.metadata (39 kB)
+Requirement already satisfied: numpy>=1.23.0 in /usr/lib/python3/dist-packages (from ultralytics) (2.2.4)
+Collecting matplotlib>=3.3.0 (from ultralytics)
+  Using cached matplotlib-3.10.8-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl.metadata (52 kB)
+Requirement already satisfied: opencv-python>=4.6.0 in ./drone_control/lib/python3.13/site-packages (from ultralytics) (4.13.0.92)
+Requirement already satisfied: pillow>=7.1.2 in /usr/lib/python3/dist-packages (from ultralytics) (11.1.0)
+Requirement already satisfied: pyyaml>=5.3.1 in /usr/lib/python3/dist-packages (from ultralytics) (6.0.2)
+Requirement already satisfied: requests>=2.23.0 in /usr/lib/python3/dist-packages (from ultralytics) (2.32.3)
+Collecting scipy>=1.4.1 (from ultralytics)
+  Using cached scipy-1.17.1-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl.metadata (62 kB)
+Collecting torch>=1.8.0 (from ultralytics)
+  Using cached torch-2.10.0-cp313-cp313-manylinux_2_28_aarch64.whl.metadata (31 kB)
+Collecting torchvision>=0.9.0 (from ultralytics)
+  Using cached torchvision-0.25.0-cp313-cp313-manylinux_2_28_aarch64.whl.metadata (5.4 kB)
+Requirement already satisfied: psutil>=5.8.0 in /usr/lib/python3/dist-packages (from ultralytics) (7.0.0)
+Collecting polars>=0.20.0 (from ultralytics)
+  Downloading https://www.piwheels.org/simple/polars/polars-1.39.2-py3-none-any.whl (823 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 824.0/824.0 kB 2.9 MB/s eta 0:00:00
+Collecting ultralytics-thop>=2.0.18 (from ultralytics)
+  Using cached https://www.piwheels.org/simple/ultralytics-thop/ultralytics_thop-2.0.18-py3-none-any.whl (28 kB)
+Collecting contourpy>=1.0.1 (from matplotlib>=3.3.0->ultralytics)
+  Using cached contourpy-1.3.3-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl.metadata (5.5 kB)
+Collecting cycler>=0.10 (from matplotlib>=3.3.0->ultralytics)
+  Using cached https://www.piwheels.org/simple/cycler/cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Collecting fonttools>=4.22.0 (from matplotlib>=3.3.0->ultralytics)
+  Downloading fonttools-4.62.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (117 kB)
+Collecting kiwisolver>=1.3.1 (from matplotlib>=3.3.0->ultralytics)
+  Downloading kiwisolver-1.5.0-cp313-cp313-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl.metadata (5.1 kB)
+Requirement already satisfied: packaging>=20.0 in /usr/lib/python3/dist-packages (from matplotlib>=3.3.0->ultralytics) (25.0)
+Collecting pyparsing>=3 (from matplotlib>=3.3.0->ultralytics)
+  Using cached https://www.piwheels.org/simple/pyparsing/pyparsing-3.3.2-py3-none-any.whl (122 kB)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/lib/python3/dist-packages (from matplotlib>=3.3.0->ultralytics) (2.9.0)
+Collecting polars-runtime-32==1.39.2 (from polars>=0.20.0->ultralytics)
+  Downloading polars_runtime_32-1.39.2-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (1.5 kB)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/lib/python3/dist-packages (from requests>=2.23.0->ultralytics) (3.4.2)
+Requirement already satisfied: idna<4,>=2.5 in /usr/lib/python3/dist-packages (from requests>=2.23.0->ultralytics) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/lib/python3/dist-packages (from requests>=2.23.0->ultralytics) (2.3.0)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/lib/python3/dist-packages (from requests>=2.23.0->ultralytics) (2025.1.31)
+Collecting filelock (from torch>=1.8.0->ultralytics)
+  Downloading https://www.piwheels.org/simple/filelock/filelock-3.25.2-py3-none-any.whl (26 kB)
+Requirement already satisfied: typing-extensions>=4.10.0 in /usr/lib/python3/dist-packages (from torch>=1.8.0->ultralytics) (4.13.2)
+Requirement already satisfied: setuptools in /usr/lib/python3/dist-packages (from torch>=1.8.0->ultralytics) (78.1.1)
+Collecting sympy>=1.13.3 (from torch>=1.8.0->ultralytics)
+  Using cached https://www.piwheels.org/simple/sympy/sympy-1.14.0-py3-none-any.whl (6.3 MB)
+Collecting networkx>=2.5.1 (from torch>=1.8.0->ultralytics)
+  Using cached https://www.piwheels.org/simple/networkx/networkx-3.6.1-py3-none-any.whl (2.1 MB)
+Requirement already satisfied: jinja2 in /usr/lib/python3/dist-packages (from torch>=1.8.0->ultralytics) (3.1.6)
+Collecting fsspec>=0.8.5 (from torch>=1.8.0->ultralytics)
+  Using cached https://www.piwheels.org/simple/fsspec/fsspec-2026.2.0-py3-none-any.whl (202 kB)
+Collecting mpmath<1.4,>=1.1.0 (from sympy>=1.13.3->torch>=1.8.0->ultralytics)
+  Using cached https://www.piwheels.org/simple/mpmath/mpmath-1.3.0-py3-none-any.whl (536 kB)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/lib/python3/dist-packages (from jinja2->torch>=1.8.0->ultralytics) (2.1.5)
+Downloading ultralytics-8.4.24-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 5.3 MB/s eta 0:00:00
+Using cached matplotlib-3.10.8-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (9.5 MB)
+Using cached contourpy-1.3.3-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (334 kB)
+Downloading fonttools-4.62.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (5.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.0/5.0 MB 6.5 MB/s eta 0:00:00
+Downloading kiwisolver-1.5.0-cp313-cp313-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 6.0 MB/s eta 0:00:00
+Downloading polars_runtime_32-1.39.2-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (43.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.2/43.2 MB 5.3 MB/s eta 0:00:00
+Using cached scipy-1.17.1-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (32.9 MB)
+Using cached torch-2.10.0-cp313-cp313-manylinux_2_28_aarch64.whl (146.0 MB)
+Using cached torchvision-0.25.0-cp313-cp313-manylinux_2_28_aarch64.whl (2.3 MB)
+Installing collected packages: mpmath, sympy, scipy, pyparsing, polars-runtime-32, networkx, kiwisolver, fsspec, fonttools, filelock, cycler, contourpy, torch, polars, matplotlib, ultralytics-thop, torchvision, ultralytics
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+types-seaborn 0.13.2 requires pandas-stubs, which is not installed.
+Successfully installed contourpy-1.3.3 cycler-0.12.1 filelock-3.25.2 fonttools-4.62.1 fsspec-2026.2.0 kiwisolver-1.5.0 matplotlib-3.10.8 mpmath-1.3.0 networkx-3.6.1 polars-1.39.2 polars-runtime-32-1.39.2 pyparsing-3.3.2 scipy-1.17.1 sympy-1.14.0 torch-2.10.0 torchvision-0.25.0 ultralytics-8.4.24 ultralytics-thop-2.0.18
+
