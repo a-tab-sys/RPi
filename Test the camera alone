@@ -182,3 +182,14 @@ QFontDatabase: Cannot find font directory /home/atab-rpi/Documents/drone_control
 Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
 QFontDatabase: Cannot find font directory /home/atab-rpi/Documents/drone_control/lib/python3.13/site-packages/cv2/qt/fonts.
 Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+
+
+
+////////
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+  File "/usr/lib/python3/dist-packages/picamera2/__init__.py", line 4, in <module>
+    import libcamera
+  File "/usr/lib/python3/dist-packages/libcamera/__init__.py", line 4, in <module>
+    from ._libcamera import *
+ModuleNotFoundError: No module named 'libcamera._libcamera'
