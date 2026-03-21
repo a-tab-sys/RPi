@@ -113,3 +113,15 @@ ncnn_model = YOLO("yolo26n_ncnn_model")
 
 # Run inference
 results = ncnn_model("https://ultralytics.com/images/bus.jpg")
+
+
+//TRYING TO FIGURE OUT A SOLUTION TO THE ISSUE OF NOT BEING ABLE TO GET YOLO TO WORK
+(drone_control) atab-rpi@atab-rpi:~/Documents $ pip install ultralytics==8.3.70 torch==2.5.1 torchvision==0.20
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting ultralytics==8.3.70
+  Downloading https://www.piwheels.org/simple/ultralytics/ultralytics-8.3.70-py3-none-any.whl (914 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 914.9/914.9 kB 2.3 MB/s  0:00:00
+ERROR: Ignored the following versions that require a different python version: 8.0.10 Requires-Python >=3.7,<=3.11; 8.0.11 Requires-Python >=3.7,<=3.11; 8.0.12 Requires-Python >=3.7,<=3.11; 8.0.13 Requires-Python >=3.7,<=3.11; 8.0.14 Requires-Python >=3.7,<=3.11; 8.0.15 Requires-Python >=3.7,<=3.11; 8.0.16 Requires-Python >=3.7,<=3.11; 8.0.17 Requires-Python >=3.7,<=3.11; 8.0.18 Requires-Python >=3.7,<=3.11; 8.0.19 Requires-Python >=3.7,<=3.11; 8.0.20 Requires-Python >=3.7,<=3.11; 8.0.21 Requires-Python >=3.7,<=3.11; 8.0.22 Requires-Python >=3.7,<=3.11; 8.0.23 Requires-Python >=3.7,<=3.11; 8.0.24 Requires-Python >=3.7,<=3.11; 8.0.25 Requires-Python >=3.7,<=3.11; 8.0.26 Requires-Python >=3.7,<=3.11; 8.0.27 Requires-Python >=3.7,<=3.11; 8.0.28 Requires-Python >=3.7,<=3.11; 8.0.29 Requires-Python >=3.7,<=3.11; 8.0.30 Requires-Python >=3.7,<=3.11; 8.0.31 Requires-Python >=3.7,<=3.11; 8.0.32 Requires-Python >=3.7,<=3.11; 8.0.33 Requires-Python >=3.7,<=3.11; 8.0.34 Requires-Python >=3.7,<=3.11; 8.0.7 Requires-Python >=3.7,<=3.11; 8.0.8 Requires-Python >=3.7,<=3.11; 8.0.9 Requires-Python >=3.7,<=3.11
+ERROR: Could not find a version that satisfies the requirement torch==2.5.1 (from versions: 2.6.0, 2.7.0, 2.7.1, 2.8.0, 2.9.0, 2.9.1, 2.10.0)
+ERROR: No matching distribution found for torch==2.5.1
+
