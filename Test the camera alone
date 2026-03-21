@@ -223,3 +223,21 @@ Traceback (most recent call last):
 ModuleNotFoundError: No module named 'libcamera._libcamera'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+
+
+
+
+////////////////////////////////////////////////////////
+atab-rpi@atab-rpi:~ $ python3 --version
+Python 3.13.5
+atab-rpi@atab-rpi:~ $ /usr/bin/python3 --version
+Python 3.13.5
+atab-rpi@atab-rpi:~ $ find /usr/lib/python3 -name "_libcamera*" 2>/dev/null
+/usr/lib/python3/dist-packages/libcamera/_libcamera.cpython-313-aarch64-linux-gnu.so
+atab-rpi@atab-rpi:~ $ ls /usr/lib/python3/dist-packages/libcamera/
+atab-rpi@atab-rpi:~ $ python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
+picamera2 OK
+atab-rpi@atab-rpi:~ $ 
+
+
