@@ -193,8 +193,9 @@ Traceback (most recent call last):
 ModuleNotFoundError: No module named 'libcamera._libcamera'
 
 /////////////////////////////////////////////
-Verifying transaction: done
-Executing transaction: done
+atab-rpi@atab-rpi:~ $ python -c "import numpy; print(numpy.__version__)"
+2.2.4
+
 (ultralytics-env) atab-rpi@atab-rpi:~ $ conda install numpy=2.2.4
 Channels:
  - conda-forge
