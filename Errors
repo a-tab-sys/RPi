@@ -169,3 +169,10 @@ atab-rpi@atab-rpi:~/RPi $ ^C
 atab-rpi@atab-rpi:~/RPi $ ^C
 atab-rpi@atab-rpi:~/RPi $ ^C
 
+
+///////////////////////////////////
+atab-rpi@atab-rpi:~ $ ls /home/atab-rpi/yolo26n_ncnn_model
+metadata.yaml  model.ncnn.bin  model.ncnn.param  model_ncnn.py  __pycache__
+atab-rpi@atab-rpi:~ $ 
+
+
