@@ -1062,3 +1062,14 @@ AttributeError: 'NoneType' object has no attribute 'jit'
 grep -n "torch\." ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
 
 sed -i 's/warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/if torch is not None: warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+
+//////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ grep -n "torch\." ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+38:LOCAL_RANK = int(os.getenv("LOCAL_RANK", -1))  # https://pytorch.org/docs/stable/elastic/run.html
+56:TORCH_VERSION = str(torch.__version__) if torch is not None else "0.0.0"  # Normalize torch.__version__ (PyTorch>1.9 returns TorchVersion objects)
+132:if torch is not None: torch.set_printoptions(linewidth=320, precision=4, profile="default")
+141:warnings.filterwarnings("ignore", message="torch.distributed.reduce_op is deprecated")  # PyTorch deprecation
+144:warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)  # ONNX/TorchScript export tracer warnings
+1486:torch.save = torch_save
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/if torch is not None: warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
