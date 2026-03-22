@@ -949,3 +949,9 @@ Traceback (most recent call last):
 AttributeError: 'NoneType' object has no attribute '__version__'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+////////////////////////////////////////////////////
+# Fix the TORCH_VERSION line
+sed -i 's/TORCH_VERSION = str(torch.__version__)/TORCH_VERSION = str(torch.__version__) if torch is not None else "0.0.0"/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+
+python3 -c "import ultralytics; print('ultralytics OK')"
