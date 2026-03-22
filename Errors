@@ -701,3 +701,27 @@ python3 -c "import torch; print('torch found')" 2>&1
 
 # Now test ultralytics
 python3 -c "import ultralytics; print('ultralytics OK')"
+
+
+
+//////////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ rm -rf ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/torch
+(ultralytics-env) atab-rpi@atab-rpi:~ $ mv ~/system-packages.pth.bak ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch; print('torch found')" 2>&1
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import torch; print('torch found')
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 26, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
