@@ -564,3 +564,38 @@ WARNING: Skipping ultralytics-thop as it is not installed.
 (ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch" 2>&1
 (ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch"
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+////////////////////////////////////////////
+# See what's in the system packages
+ls /usr/lib/python3/dist-packages/ | grep torch
+
+
+# Create a .pth file that blocks torch specifically
+python3 -c "
+import site
+print(site.getsitepackages())
+"
+
+
+# Replace the broad system path with specific paths only
+echo '/usr/lib/python3/dist-packages/picamera2' > ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+echo '/usr/lib/python3/dist-packages/libcamera' >> ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+echo '/usr/lib/python3/dist-packages' >> ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+
+
+cat > ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/usercustomize.py << 'EOF'
+import sys
+
+class BlockTorch:
+    def find_module(self, name, path=None):
+        if name == 'torch' or name.startswith('torch.'):
+            raise ImportError(f"torch blocked — not compatible with Pi 4B CPU")
+        return None
+
+sys.meta_path.insert(0, BlockTorch())
+EOF
+
+
+
+python3 -c "import ultralytics; print('ultralytics OK')"
