@@ -1380,3 +1380,43 @@ python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
 -------------------------
 pip install ultralytics --upgrade
 python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+
+
+//////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+Looking in indexes: https://download.pytorch.org/whl/cpu, https://www.piwheels.org/simple
+Collecting torch
+  Using cached https://download.pytorch.org/whl/cpu/torch-2.10.0%2Bcpu-cp313-cp313-manylinux_2_28_aarch64.whl.metadata (29 kB)
+Collecting torchvision
+  Using cached https://download-r2.pytorch.org/whl/cpu/torchvision-0.25.0%2Bcpu-cp313-cp313-manylinux_2_28_aarch64.whl.metadata (5.4 kB)
+Collecting filelock (from torch)
+  Using cached https://www.piwheels.org/simple/filelock/filelock-3.25.2-py3-none-any.whl (26 kB)
+Requirement already satisfied: typing-extensions>=4.10.0 in /usr/lib/python3/dist-packages (from torch) (4.13.2)
+Requirement already satisfied: setuptools in /usr/lib/python3/dist-packages (from torch) (78.1.1)
+Collecting sympy>=1.13.3 (from torch)
+  Using cached https://www.piwheels.org/simple/sympy/sympy-1.14.0-py3-none-any.whl (6.3 MB)
+Collecting networkx>=2.5.1 (from torch)
+  Using cached https://www.piwheels.org/simple/networkx/networkx-3.6.1-py3-none-any.whl (2.1 MB)
+Requirement already satisfied: jinja2 in /usr/lib/python3/dist-packages (from torch) (3.1.6)
+Collecting fsspec>=0.8.5 (from torch)
+  Using cached https://www.piwheels.org/simple/fsspec/fsspec-2026.2.0-py3-none-any.whl (202 kB)
+Requirement already satisfied: numpy in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from torchvision) (2.4.3)
+Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from torchvision) (12.1.1)
+Collecting mpmath<1.4,>=1.1.0 (from sympy>=1.13.3->torch)
+  Using cached https://www.piwheels.org/simple/mpmath/mpmath-1.3.0-py3-none-any.whl (536 kB)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/lib/python3/dist-packages (from jinja2->torch) (2.1.5)
+Using cached https://download.pytorch.org/whl/cpu/torch-2.10.0%2Bcpu-cp313-cp313-manylinux_2_28_aarch64.whl (146.5 MB)
+Using cached https://download-r2.pytorch.org/whl/cpu/torchvision-0.25.0%2Bcpu-cp313-cp313-manylinux_2_28_aarch64.whl (2.3 MB)
+Installing collected packages: mpmath, sympy, networkx, fsspec, filelock, torch, torchvision
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+ultralytics 8.4.24 requires ultralytics-thop>=2.0.18, which is not installed.
+Successfully installed filelock-3.25.2 fsspec-2026.2.0 mpmath-1.3.0 networkx-3.6.1 sympy-1.14.0 torch-2.10.0+cpu torchvision-0.25.0+cpu
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch; print('torch:', torch.__version__)"
+torch: 2.10.0+cpu
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+Creating new Ultralytics Settings v0.0.6 file ✅ 
+View Ultralytics Settings with 'yolo settings' or at '/home/atab-rpi/.config/Ultralytics/settings.json'
+Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=path/to/dir'. For help see https://docs.ultralytics.com/quickstart/#ultralytics-settings.
+ultralytics OK
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
