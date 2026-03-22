@@ -787,3 +787,16 @@ Traceback (most recent call last):
 ModuleNotFoundError: No module named 'torch'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+
+//////////////////////////////////////////////////
+sed -i 's/^import torch$/try:\n    import torch\nexcept (ImportError, Exception):\n    torch = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/patches.py
+
+python3 -c "import ultralytics; print('ultralytics OK')"
+
+# Find all ultralytics files that have 'import torch'
+grep -rl "^import torch$" ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/
+
+# Then patch all of them at once
+grep -rl "^import torch$" ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/ | xargs sed -i 's/^import torch$/try:\n    import torch\nexcept (ImportError, Exception):\n    torch = None/'
+
