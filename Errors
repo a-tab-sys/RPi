@@ -1073,3 +1073,11 @@ sed -i 's/warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/if
 1486:torch.save = torch_save
 (ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/if torch is not None: warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+
+//////////////////////////////////////////////////////
+# Fix line 1486: torch.save = torch_save
+sed -i 's/torch.save = torch_save/if torch is not None: torch.save = torch_save/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+
+python3 -c "import ultralytics; print('ultralytics OK')"
