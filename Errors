@@ -992,3 +992,46 @@ importlib.metadata.PackageNotFoundError: No package metadata was found for torch
 sed -i 's/TORCHVISION_VERSION = importlib.metadata.version("torchvision")/TORCHVISION_VERSION = "0.0.0"/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
 
 python3 -c "import ultralytics; print('ultralytics OK')"
+
+
+//////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/TORCH_VERSION = str(torch.__version__)/TORCH_VERSION = str(torch.__version__) if torch is not None else "0.0.0"/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/importlib/metadata/__init__.py", line 407, in from_name
+    return next(iter(cls.discover(name=name)))
+StopIteration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 57, in <module>
+    TORCHVISION_VERSION = importlib.metadata.version("torchvision")  # faster than importing torchvision
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/importlib/metadata/__init__.py", line 987, in version
+    return distribution(distribution_name).version
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/importlib/metadata/__init__.py", line 960, in distribution
+    return Distribution.from_name(distribution_name)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/importlib/metadata/__init__.py", line 409, in from_name
+    raise PackageNotFoundError(name)
+importlib.metadata.PackageNotFoundError: No package metadata was found for torchvision
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/TORCHVISION_VERSION = importlib.metadata.version("torchvision")/TORCHVISION_VERSION = "0.0.0"/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 132, in <module>
+    torch.set_printoptions(linewidth=320, precision=4, profile="default")
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'set_printoptions'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
