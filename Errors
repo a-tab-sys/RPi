@@ -1123,3 +1123,49 @@ python3 -c "import ultralytics; print('ultralytics OK')"
 
 # Patch all 'import torch.X as Y' lines across all files
 grep -rl "^import torch\." ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/ | xargs sed -i 's/^import torch\.\(.*\) as \(.*\)$/try:\n    import torch.\1 as \2\nexcept (ImportError, Exception):\n    \2 = None/'
+
+
+
+//////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/^import torch$/try:\n    import torch\nexcept (ImportError, Exception):\n    torch = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/^import torch\.\(.*\) as \(.*\)$/try:\n    import torch.\1 as \2\nexcept (ImportError, Exception):\n    \2 = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ grep -n "^import torch" ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1466, in <module>
+    SETTINGS = SettingsManager()  # initialize settings
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1380, in __init__
+    with torch_distributed_zero_first(LOCAL_RANK):
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py", line 77, in torch_distributed_zero_first
+    initialized = dist.is_available() and dist.is_initialized()
+                  ^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'is_available'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ grep -rl "^import torch\." ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/ | xargs sed -i 's/^import torch\.\(.*\) as \(.*\)$/try:\n    import torch.\1 as \2\nexcept (ImportError, Exception):\n    \2 = None/'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1466, in <module>
+    SETTINGS = SettingsManager()  # initialize settings
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1380, in __init__
+    with torch_distributed_zero_first(LOCAL_RANK):
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py", line 77, in torch_distributed_zero_first
+    initialized = dist.is_available() and dist.is_initialized()
+                  ^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'is_available'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
