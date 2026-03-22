@@ -631,3 +631,30 @@ Traceback (most recent call last):
 AttributeError: module 'torch' has no attribute 'save'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+
+
+
+
+
+////////////////////////////////////////////////
+python3 -c "
+import torch
+import os
+print('file:', torch.__file__)
+print('path:', torch.__path__)
+print('version:', getattr(torch, '__version__', 'NO VERSION'))
+print('has save:', hasattr(torch, 'save'))
+
+
+# Check system dist-packages for torch
+ls /usr/lib/python3/dist-packages/ | grep -i torch
+ls /usr/local/lib/ | grep -i torch
+
+# Check if there's a torch in the Pi's system Python
+/usr/bin/python3 -c "import torch; print(torch.__file__)"
+
+
+mv ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth ~/system-packages.pth.bak
+
+python3 -c "import torch; print(torch.__file__)"
