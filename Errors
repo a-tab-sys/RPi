@@ -599,3 +599,35 @@ EOF
 
 
 python3 -c "import ultralytics; print('ultralytics OK')"
+
+
+
+
+////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ cat > ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/usercustomize.py << 'EOF'
+import sys
+
+class BlockTorch:
+    def find_module(self, name, path=None):
+        if name == 'torch' or name.startswith('torch.'):
+            raise ImportError(f"torch blocked — not compatible with Pi 4B CPU")
+        return None
+
+sys.meta_path.insert(0, BlockTorch())
+EOF
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 30, in <module>
+    from ultralytics.utils.patches import imread, imshow, imwrite, torch_save  # for patches
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/patches.py", line 154, in <module>
+    _torch_save = torch.save
+                  ^^^^^^^^^^
+AttributeError: module 'torch' has no attribute 'save'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
