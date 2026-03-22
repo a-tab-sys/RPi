@@ -1169,3 +1169,9 @@ Traceback (most recent call last):
 AttributeError: 'NoneType' object has no attribute 'is_available'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+//////////////////////////////////////////
+python3 -c "import torch; print(torch.__version__)"
+python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
+python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+
