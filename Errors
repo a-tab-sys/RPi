@@ -212,3 +212,31 @@ conda remove ultralytics -y
 # Install from pip (uses pure Python wheels, no compiled extensions)
 pip install ultralytics --no-deps
 pip install numpy pillow pyyaml tqdm psutil requests ultralytics-thop
+
+
+
+
+//////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "
+from ultralytics import YOLO
+model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
+print('YOLO26n NCNN loaded successfully — no PyTorch needed!')
+"
+Illegal instruction
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "print('step 1')"
+step 1
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('step 2')"
+Illegal instruction
+(ultralytics-env) atab-rpi@atab-rpi:~ $ pip show ultralytics
+Name: ultralytics
+Version: 8.4.24
+Summary: Ultralytics YOLO 🚀 for SOTA object detection, multi-object tracking, instance segmentation, pose estimation and image classification.
+Home-page: https://ultralytics.com
+Author: 
+Author-email: Glenn Jocher <glenn.jocher@ultralytics.com>, Jing Qiu <jing.qiu@ultralytics.com>
+License: AGPL-3.0
+Location: /home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages
+Requires: matplotlib, numpy, opencv-python, pillow, polars, psutil, pyyaml, requests, scipy, torch, torchvision, ultralytics-thop
+Required-by: 
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
