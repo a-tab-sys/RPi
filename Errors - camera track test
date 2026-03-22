@@ -48,3 +48,28 @@ from picamera2 import Picamera2
 info = Picamera2.global_camera_info()
 print('Cameras found:', info)
 "
+/////////////////////////////////////////////////////
+atab-rpi@atab-rpi:~ $ libcamera-hello --list-cameras
+bash: libcamera-hello: command not found
+atab-rpi@atab-rpi:~ $ rpicam-hello --list-cameras
+No cameras available!
+atab-rpi@atab-rpi:~ $ which rpicam-hello
+/usr/bin/rpicam-hello
+atab-rpi@atab-rpi:~ $ which libcamera-hello
+atab-rpi@atab-rpi:~ $ find /usr -name "rpicam-hello" 2>/dev/null
+/usr/bin/rpicam-hello
+findatab-rpi@atab-rpi:~ $ find /usr -name "libcamera-hello" 2>/dev/null
+atab-rpi@atab-rpi:~ $ ls /dev/video*
+/dev/video19  /dev/video23  /dev/video27  /dev/video31  /dev/video35
+/dev/video20  /dev/video24  /dev/video28  /dev/video32
+/dev/video21  /dev/video25  /dev/video29  /dev/video33
+/dev/video22  /dev/video26  /dev/video30  /dev/video34
+atab-rpi@atab-rpi:~ $ python3 -c "
+from picamera2 import Picamera2
+info = Picamera2.global_camera_info()
+print('Cameras found:', info)
+"
+[2:22:30.747723494] [3699]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+Cameras found: []
+atab-rpi@atab-rpi:~ $ 
+
