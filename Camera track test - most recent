@@ -532,7 +532,7 @@ def perception_thread(state: SharedState, stop_event: threading.Event):
     When set, this function exits its loop and releases the camera cleanly.
     """
     # ── Initialise CSI camera via picamera2 ───────────────────────────────────
-    picam2 = Picamera2()
+    picam2 = Picamera2(0)
     config = picam2.create_preview_configuration(
         main={"size": (FRAME_W, FRAME_H), "format": "RGB888"}
         # RGB888 = 8-bit per channel, RGB colour order
