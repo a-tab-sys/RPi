@@ -658,3 +658,29 @@ ls /usr/local/lib/ | grep -i torch
 mv ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth ~/system-packages.pth.bak
 
 python3 -c "import torch; print(torch.__file__)"
+
+///////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "
+import torch
+import os
+print('file:', torch.__file__)
+print('path:', torch.__path__)
+print('version:', getattr(torch, '__version__', 'NO VERSION'))
+print('has save:', hasattr(torch, 'save'))"
+file: None
+path: _NamespacePath(['/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/torch'])
+version: NO VERSION
+has save: False
+(ultralytics-env) atab-rpi@atab-rpi:~ $ ls /usr/lib/python3/dist-packages/ | grep -i torch
+ls /usr/local/lib/ | grep -i torch
+(ultralytics-env) atab-rpi@atab-rpi:~ $ /usr/bin/python3 -c "import torch; print(torch.__file__)"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import torch; print(torch.__file__)
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ mv ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth ~/system-packages.pth.bak
+
+python3 -c "import torch; print(torch.__file__)"
+None
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
