@@ -1420,3 +1420,29 @@ Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=pat
 ultralytics OK
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+///////////////////////////////////////////////////////
+
+python3 -c "
+from picamera2 import Picamera2
+from ultralytics import YOLO
+import cv2
+import serial
+print('ALL IMPORTS OK — ready to run drone code!')
+"
+
+---------------
+
+python3 -c "
+from ultralytics import YOLO
+model = YOLO('yolo26n.pt')
+model.export(format='ncnn')
+print('NCNN export done!')
+"
+-----------------
+
+python3 -c "
+from ultralytics import YOLO
+model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
+print('YOLO26n NCNN loaded!')
+"
