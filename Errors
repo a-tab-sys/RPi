@@ -1446,3 +1446,128 @@ from ultralytics import YOLO
 model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
 print('YOLO26n NCNN loaded!')
 "
+
+////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "
+from picamera2 import Picamera2
+from ultralytics import YOLO
+import cv2
+import serial
+print('ALL IMPORTS OK — ready to run drone code!')
+"
+ALL IMPORTS OK — ready to run drone code!
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "
+from ultralytics import YOLO
+model = YOLO('yolo26n.pt')
+model.export(format='ncnn')
+print('NCNN export done!')
+"
+Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': Downloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': 100% ━━━━━━━━━━━━ 5.3MB 2.6MB/s 2.0s
+Ultralytics 8.4.24 🚀 Python-3.13.12 torch-2.10.0+cpu CPU (aarch64)
+WARNING ⚠️ NCNN export does not support end2end models, disabling end2end branch.
+YOLO26n summary (fused): 146 layers, 2,562,496 parameters, 0 gradients
+
+PyTorch: starting from 'yolo26n.pt' with input shape (1, 3, 640, 640) BCHW and output shape(s) (1, 84, 8400) (5.3 MB)
+requirements: Ultralytics requirement ['ncnn'] not found, attempting AutoUpdate...
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting ncnn
+  Downloading ncnn-1.0.20260114-cp313-cp313-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl.metadata (27 kB)
+Downloading ncnn-1.0.20260114-cp313-cp313-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (4.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.0/4.0 MB 2.9 MB/s  0:00:01
+Installing collected packages: ncnn
+Successfully installed ncnn-1.0.20260114
+
+requirements: AutoUpdate success ✅ 3.7s
+WARNING ⚠️ requirements: Restart runtime or rerun command for updates to take effect
+
+requirements: Ultralytics requirement ['pnnx'] not found, attempting AutoUpdate...
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting pnnx
+  Downloading pnnx-20260112-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl.metadata (6.2 kB)
+Requirement already satisfied: torch in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from pnnx) (2.10.0+cpu)
+Requirement already satisfied: filelock in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from torch->pnnx) (3.25.2)
+Requirement already satisfied: typing-extensions>=4.10.0 in /usr/lib/python3/dist-packages (from torch->pnnx) (4.13.2)
+Requirement already satisfied: setuptools in /usr/lib/python3/dist-packages (from torch->pnnx) (78.1.1)
+Requirement already satisfied: sympy>=1.13.3 in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from torch->pnnx) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from torch->pnnx) (3.6.1)
+Requirement already satisfied: jinja2 in /usr/lib/python3/dist-packages (from torch->pnnx) (3.1.6)
+Requirement already satisfied: fsspec>=0.8.5 in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from torch->pnnx) (2026.2.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in ./miniforge3/envs/ultralytics-env/lib/python3.13/site-packages (from sympy>=1.13.3->torch->pnnx) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/lib/python3/dist-packages (from jinja2->torch->pnnx) (2.1.5)
+Downloading pnnx-20260112-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (23.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 23.4/23.4 MB 2.8 MB/s  0:00:08
+Installing collected packages: pnnx
+Successfully installed pnnx-20260112
+
+requirements: AutoUpdate success ✅ 10.6s
+WARNING ⚠️ requirements: Restart runtime or rerun command for updates to take effect
+
+
+NCNN: starting export with NCNN 1.0.20260114 and PNNX 20260112...
+pnnxparam = yolo26n_ncnn_model/model.pnnx.param
+pnnxbin = yolo26n_ncnn_model/model.pnnx.bin
+pnnxpy = yolo26n_ncnn_model/model_pnnx.py
+pnnxonnx = yolo26n_ncnn_model/model.pnnx.onnx
+ncnnparam = yolo26n_ncnn_model/model.ncnn.param
+ncnnbin = yolo26n_ncnn_model/model.ncnn.bin
+ncnnpy = yolo26n_ncnn_model/model_ncnn.py
+fp16 = 0
+optlevel = 2
+device = cpu
+inputshape = [1,3,640,640]f32
+inputshape2 = 
+customop = 
+moduleop = 
+get inputshape from traced inputs
+inputshape = [1,3,640,640]f32
+############# pass_level0
+inline module = torch.nn.modules.linear.Identity
+inline module = ultralytics.nn.modules.block.Attention
+inline module = ultralytics.nn.modules.block.Bottleneck
+inline module = ultralytics.nn.modules.block.C2PSA
+inline module = ultralytics.nn.modules.block.C3k
+inline module = ultralytics.nn.modules.block.C3k2
+inline module = ultralytics.nn.modules.block.PSABlock
+inline module = ultralytics.nn.modules.block.SPPF
+inline module = ultralytics.nn.modules.conv.Concat
+inline module = ultralytics.nn.modules.conv.Conv
+inline module = ultralytics.nn.modules.conv.DWConv
+inline module = ultralytics.nn.modules.head.Detect
+inline module = torch.nn.modules.linear.Identity
+inline module = ultralytics.nn.modules.block.Attention
+inline module = ultralytics.nn.modules.block.Bottleneck
+inline module = ultralytics.nn.modules.block.C2PSA
+inline module = ultralytics.nn.modules.block.C3k
+inline module = ultralytics.nn.modules.block.C3k2
+inline module = ultralytics.nn.modules.block.PSABlock
+inline module = ultralytics.nn.modules.block.SPPF
+inline module = ultralytics.nn.modules.conv.Concat
+inline module = ultralytics.nn.modules.conv.Conv
+inline module = ultralytics.nn.modules.conv.DWConv
+inline module = ultralytics.nn.modules.head.Detect
+
+----------------
+
+############# pass_level1
+############# pass_level2
+############# pass_level3
+############# pass_level4
+############# pass_level5
+############# pass_ncnn
+NCNN: export success ✅ 20.4s, saved as 'yolo26n_ncnn_model' (9.5 MB)
+
+Export complete (21.3s)
+Results saved to /home/atab-rpi
+Predict:         yolo predict task=detect model=yolo26n_ncnn_model imgsz=640 
+Validate:        yolo val task=detect model=yolo26n_ncnn_model imgsz=640 data=/home/lq/codes/ultralytics/ultralytics/cfg/datasets/coco.yaml  
+Visualize:       https://netron.app
+NCNN export done!
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "
+from ultralytics import YOLO
+model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
+print('YOLO26n NCNN loaded!')
+"
+WARNING ⚠️ Unable to automatically guess model task, assuming 'task=detect'. Explicitly define task for your model, i.e. 'task=detect', 'segment', 'classify','pose' or 'obb'.
+YOLO26n NCNN loaded!
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
