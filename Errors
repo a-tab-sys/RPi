@@ -1056,3 +1056,9 @@ Traceback (most recent call last):
                                                ^^^^^^^^^
 AttributeError: 'NoneType' object has no attribute 'jit'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+//////////////////////////////////////
+grep -n "torch\." ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+
+sed -i 's/warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/if torch is not None: warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
