@@ -240,3 +240,23 @@ Requires: matplotlib, numpy, opencv-python, pillow, polars, psutil, pyyaml, requ
 Required-by: 
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+/////////////////////////////////
+# Remove the broken Conda ultralytics
+conda remove ultralytics -y
+
+# Install from pip instead
+pip install ultralytics --no-deps
+pip install numpy pillow pyyaml tqdm psutil requests ultralytics-thop opencv-python-headless
+
+# Test
+python3 -c "import ultralytics; print('step 2 OK')"
+
+
+
+
+python3 -c "
+from ultralytics import YOLO
+model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
+print('YOLO26n NCNN loaded!')
+"
