@@ -1035,3 +1035,8 @@ Traceback (most recent call last):
 AttributeError: 'NoneType' object has no attribute 'set_printoptions'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+/////////////////////////////////////////////////////
+sed -i 's/torch.set_printoptions(linewidth=320, precision=4, profile="default")/if torch is not None: torch.set_printoptions(linewidth=320, precision=4, profile="default")/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+
+python3 -c "import ultralytics; print('ultralytics OK')"
