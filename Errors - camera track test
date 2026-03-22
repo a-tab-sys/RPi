@@ -1,0 +1,27 @@
+//////////////////////////////////////////////////////
+>>> %Run -c $EDITOR_CONTENT
+[MSP] TEST_CAMERA_ONLY = True — serial disabled, no commands sent to FC
+[CTRL] Camera-only test mode. Move in front of camera to test detection.[1:48:31.438967265] [3451]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+
+Exception in thread [CTRL] Watch the debug window — orange box should track you.Thread-1 (perception_thread)
+:
+[CTRL] Check eX/eY/eH values: eX=horizontal error, eY=vertical, eH=distance
+Traceback (most recent call last):
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/threading.py", line 1044, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/threading.py", line 995, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 535, in perception_thread
+  File "/usr/lib/python3/dist-packages/picamera2/picamera2.py", line 341, in __init__
+    camera_num = self.global_camera_info()[camera_num]['Num']
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+IndexError: list index out of range
+[CTRL] FPS≈102633.9 | CAMERA TEST MODE | LOST
+[CTRL] FPS≈267153.1 | CAMERA TEST MODE | LOST
+[CTRL] FPS≈175984.8 | CAMERA TEST MODE | LOST
+[CTRL] FPS≈176478.4 | CAMERA TEST MODE | LOST
+[CTRL] FPS≈261056.3 | CAMERA TEST MODE | LOST
+[CTRL] FPS≈253177.3 | CAMERA TEST MODE | LOST
+[CTRL] FPS≈278383.0 | CAMERA TEST MODE | LOST
