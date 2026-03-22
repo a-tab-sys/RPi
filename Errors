@@ -530,3 +530,23 @@ Installing collected packages: opencv-python-headless
 Successfully installed opencv-python-headless-4.13.0.92
 (ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('step 2 OK')"
 Illegal instruction
+
+
+
+
+/////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 30, in <module>
+    from ultralytics.utils.patches import imread, imshow, imwrite, torch_save  # for patches
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/patches.py", line 154, in <module>
+    _torch_save = torch.save
+                  ^^^^^^^^^^
+AttributeError: module 'torch' has no attribute 'save'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
