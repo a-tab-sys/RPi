@@ -25,3 +25,26 @@ IndexError: list index out of range
 [CTRL] FPS≈261056.3 | CAMERA TEST MODE | LOST
 [CTRL] FPS≈253177.3 | CAMERA TEST MODE | LOST
 [CTRL] FPS≈278383.0 | CAMERA TEST MODE | LOST
+
+
+
+
+////////////////////////////////////////////////////////////
+# Option 1 - rpicam version
+rpicam-hello --list-cameras
+
+# Option 2 - check if libcamera tools exist anywhere
+which rpicam-hello
+which libcamera-hello
+find /usr -name "rpicam-hello" 2>/dev/null
+find /usr -name "libcamera-hello" 2>/dev/null
+
+# Option 3 - check if camera is detected at system level
+ls /dev/video*
+
+# Option 4 - check via Python directly
+python3 -c "
+from picamera2 import Picamera2
+info = Picamera2.global_camera_info()
+print('Cameras found:', info)
+"
