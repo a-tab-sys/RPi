@@ -1206,3 +1206,32 @@ Traceback (most recent call last):
 AttributeError: 'NoneType' object has no attribute 'split'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
+
+
+/////////////////////////////////////////
+# Check if torchvision is installed
+python3 -c "import torchvision; print(torchvision.__version__)"
+
+----
+
+conda install -c pytorch torchvision cpuonly -y
+
+----
+
+python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+
+-----
+
+# Reinstall ultralytics fresh from Conda (overwrites any patched files)
+conda install -c conda-forge ultralytics -y
+
+# Test
+python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+
+-----
+
+# In a NEW terminal (outside Conda)
+python3 -c "import numpy; print(numpy.__version__)"
+
+# Then back in Conda env, match it
+conda install numpy=X.X.X -y
