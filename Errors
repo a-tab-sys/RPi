@@ -684,3 +684,20 @@ ModuleNotFoundError: No module named 'torch'
 python3 -c "import torch; print(torch.__file__)"
 None
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+
+
+///////////////////////////////////////////////
+# Delete the broken empty torch folder
+rm -rf ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/torch
+
+# Restore the system packages path (needed for picamera2)
+mv ~/system-packages.pth.bak ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+
+# Verify torch is truly gone
+python3 -c "import torch; print('torch found')" 2>&1
+# Should say: ModuleNotFoundError: No module named 'torch'
+
+# Now test ultralytics
+python3 -c "import ultralytics; print('ultralytics OK')"
