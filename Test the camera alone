@@ -241,3 +241,22 @@ picamera2 OK
 atab-rpi@atab-rpi:~ $ 
 
 
+
+
+
+///////////////////////////////
+atab-rpi@atab-rpi:~ $ python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
+picamera2 OK
+atab-rpi@atab-rpi:~ $ python3 -c "import libcamera; print('libcamera OK')"
+libcamera OK
+
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from picamera2 import Picamera2; print('picamera2 OK')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'picamera2'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+
