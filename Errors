@@ -550,3 +550,17 @@ Traceback (most recent call last):
                   ^^^^^^^^^^
 AttributeError: module 'torch' has no attribute 'save'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+
+/////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch; print(torch.__file__)"
+None
+(ultralytics-env) atab-rpi@atab-rpi:~ $ pip uninstall torch torchvision torchaudio ultralytics-thop -y
+WARNING: Skipping torch as it is not installed.
+WARNING: Skipping torchvision as it is not installed.
+WARNING: Skipping torchaudio as it is not installed.
+WARNING: Skipping ultralytics-thop as it is not installed.
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch" 2>&1
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch"
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
