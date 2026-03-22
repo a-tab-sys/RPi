@@ -985,3 +985,10 @@ Traceback (most recent call last):
     raise PackageNotFoundError(name)
 importlib.metadata.PackageNotFoundError: No package metadata was found for torchvision
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+
+////////////////////////////////////
+sed -i 's/TORCHVISION_VERSION = importlib.metadata.version("torchvision")/TORCHVISION_VERSION = "0.0.0"/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+
+python3 -c "import ultralytics; print('ultralytics OK')"
