@@ -739,3 +739,51 @@ sed -n '150,158p' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages
 sed -i 's/_torch_save = torch.save/if torch is not None:\n    _torch_save = torch.save\nelse:\n    _torch_save = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/patches.py
 
 python3 -c "import ultralytics; print('ultralytics OK')"
+
+
+
+/////////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -n '20,35p' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+from threading import Lock
+from types import SimpleNamespace
+from urllib.parse import unquote
+
+import cv2
+import numpy as np
+import torch
+
+from ultralytics import __version__
+from ultralytics.utils.git import GitRepo
+from ultralytics.utils.patches import imread, imshow, imwrite, torch_save  # for patches
+from ultralytics.utils.tqdm import TQDM  # noqa
+
+# PyTorch Multi-GPU DDP Constants
+RANK = int(os.getenv("RANK", -1))
+LOCAL_RANK = int(os.getenv("LOCAL_RANK", -1))  # https://pytorch.org/docs/stable/elastic/run.html
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/^import torch$/try:\n    import torch\nexcept (ImportError, Exception):\n    torch = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -n '150,158p' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/patches.py
+    _imshow(winname.encode("unicode_escape").decode(), mat)
+
+
+# PyTorch functions ----------------------------------------------------------------------------------------------------
+_torch_save = torch.save
+
+
+def torch_load(*args, **kwargs):
+    """Load a PyTorch model with updated arguments to avoid warnings.
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/_torch_save = torch.save/if torch is not None:\n    _torch_save = torch.save\nelse:\n    _torch_save = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/patches.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 33, in <module>
+    from ultralytics.utils.patches import imread, imshow, imwrite, torch_save  # for patches
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/patches.py", line 14, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
