@@ -145,3 +145,27 @@ git pull origin main
 cd /home/atab-rpi/rpi
 git remote set-url origin https://a-tab-sys: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@github.com/a-tab-sys/RPi.git
 git pull origin main
+
+
+
+
+
+
+
+/////////////////
+atab-rpi@atab-rpi:~/RPi $ git pull origin main
+Username for 'https://github.com': a-tab-sys
+Password for 'https://a-tab-sys@github.com': 
+atab-rpi@atab-rpi:~/RPi $ ^C
+atab-rpi@atab-rpi:~/RPi $ ^C
+atab-rpi@atab-rpi:~/RPi $ git pull origin main
+Username for 'https://github.com': a-tab-sys
+Password for 'https://a-tab-sys@github.com': 
+atab-rpi@atab-rpi:~/RPi $ git remote set-url origin https://a-tab-sys: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@github.com/a-tab-sys/RPi.git
+git pull origin main
+remote: Write access to repository not granted.
+fatal: unable to access 'https://github.com/a-tab-sys/RPi.git/': The requested URL returned error: 403
+atab-rpi@atab-rpi:~/RPi $ ^C
+atab-rpi@atab-rpi:~/RPi $ ^C
+atab-rpi@atab-rpi:~/RPi $ ^C
+
