@@ -182,3 +182,16 @@ from ultralytics import YOLO
 model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
 print('YOLO26n NCNN loaded successfully — no PyTorch needed!')
 "
+
+
+
+////////////////////////////////////////
+atab-rpi@atab-rpi:~ $ source ~/miniforge3/bin/activate
+(base) atab-rpi@atab-rpi:~ $ conda activate ultralytics-env
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "
+from ultralytics import YOLO
+model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
+print('YOLO26n NCNN loaded successfully — no PyTorch needed!')
+"
+Illegal instruction
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
