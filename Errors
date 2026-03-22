@@ -137,3 +137,7 @@ ERROR: No matching distribution found for torch==2.5.1
 
 ////////////
 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
+
+cd /home/atab-rpi/rpi
+git remote set-url origin https://YOUR_USERNAME:YOUR_TOKEN@github.com/YOUR_USERNAME/YOUR_REPO.git
+git pull origin main
