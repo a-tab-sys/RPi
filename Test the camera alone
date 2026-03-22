@@ -333,3 +333,12 @@ Successfully installed filelock-3.25.2 fsspec-2026.2.0 mpmath-1.3.0 networkx-3.6
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
 
 
+
+///////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ pip install ultralytics-thop>=2.0.18
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch; print(torch.__version__)"
+Illegal instruction
+(ultralytics-env) atab-rpi@atab-rpi:~ $ ^C
+
+
+
