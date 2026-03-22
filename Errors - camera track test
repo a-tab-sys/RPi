@@ -73,3 +73,39 @@ print('Cameras found:', info)
 Cameras found: []
 atab-rpi@atab-rpi:~ $ 
 
+
+
+//////////////////////////////////////////////////////
+atab-rpi@atab-rpi:~ $ libcamera-hello --list-cameras
+bash: libcamera-hello: command not found
+atab-rpi@atab-rpi:~ $ rpicam-hello --list-cameras
+Available cameras
+-----------------
+0 : ov5647 [2592x1944 10-bit GBRG] (/base/axi/pcie@1000120000/rp1/i2c@80000/ov5647@36)
+    Modes: 'SGBRG10_CSI2P' : 640x480 [58.92 fps - (16, 0)/2560x1920 crop]
+                             1296x972 [46.34 fps - (0, 0)/2592x1944 crop]
+                             1920x1080 [32.81 fps - (348, 434)/1928x1080 crop]
+                             2592x1944 [15.63 fps - (0, 0)/2592x1944 crop]
+
+atab-rpi@atab-rpi:~ $ which rpicam-hello
+/usr/bin/rpicam-hello
+atab-rpi@atab-rpi:~ $ which libcamera-hello
+atab-rpi@atab-rpi:~ $ find /usr -name "rpicam-hello" 2>/dev/null
+/usr/bin/rpicam-hello
+atab-rpi@atab-rpi:~ $ find /usr -name "libcamera-hello" 2>/dev/null
+atab-rpi@atab-rpi:~ $ python3 -c "
+from picamera2 import Picamera2
+info = Picamera2.global_camera_info()
+print('Cameras found:', info)
+"
+[0:07:05.052804764] [2318]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+[0:07:05.061967560] [2321]  INFO RPI pisp.cpp:720 libpisp version 1.3.0
+[0:07:05.069788282] [2321]  INFO IPAProxy ipa_proxy.cpp:180 Using tuning file /usr/share/libcamera/ipa/rpi/pisp/ov5647.json
+[0:07:05.078147616] [2321]  INFO Camera camera_manager.cpp:223 Adding camera '/base/axi/pcie@1000120000/rp1/i2c@80000/ov5647@36' for pipeline handler rpi/pisp
+[0:07:05.078246690] [2321]  INFO RPI pisp.cpp:1181 Registered camera /base/axi/pcie@1000120000/rp1/i2c@80000/ov5647@36 to CFE device /dev/media0 and ISP device /dev/media2 using PiSP variant BCM2712_C0
+Cameras found: [{'Model': 'ov5647', 'Location': 2, 'Rotation': 0, 'Id': '/base/axi/pcie@1000120000/rp1/i2c@80000/ov5647@36', 'Num': 0}]
+atab-rpi@atab-rpi:~ $ ^C
+atab-rpi@atab-rpi:~ $ ^C
+atab-rpi@atab-rpi:~ $ ^C
+atab-rpi@atab-rpi:~ $ 
+
