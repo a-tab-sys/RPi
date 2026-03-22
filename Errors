@@ -176,3 +176,9 @@ metadata.yaml  model.ncnn.bin  model.ncnn.param  model_ncnn.py  __pycache__
 atab-rpi@atab-rpi:~ $ 
 
 
+//////////////////////////////////
+python3 -c "
+from ultralytics import YOLO
+model = YOLO('/home/atab-rpi/yolo26n_ncnn_model')
+print('YOLO26n NCNN loaded successfully — no PyTorch needed!')
+"
