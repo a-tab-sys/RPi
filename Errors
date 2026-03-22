@@ -1175,3 +1175,34 @@ python3 -c "import torch; print(torch.__version__)"
 python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
 python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
 
+
+
+
+////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ echo '/usr/lib/python3/dist-packages' > ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torch; print(torch.__version__)"
+python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
+python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+2.10.0
+picamera2 OK
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from ultralytics import YOLO; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1463, in <module>
+    SETTINGS = SettingsManager()  # initialize settings
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1342, in __init__
+    from ultralytics.utils.torch_utils import torch_distributed_zero_first
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py", line 35, in <module>
+    from ultralytics.utils.checks import check_version
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/checks.py", line 1049, in <module>
+    check_torchvision()  # check torch-torchvision compatibility
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/checks.py", line 560, in check_torchvision
+    v_torchvision = ".".join(TORCHVISION_VERSION.split("+", 1)[0].split(".")[:2])
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'split'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
