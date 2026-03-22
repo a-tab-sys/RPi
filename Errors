@@ -1303,3 +1303,25 @@ Traceback (most recent call last):
                              ^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'NoneType' object has no attribute 'split'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+//////////////////////////////////////////////////
+# Deactivate and delete the broken environment
+conda deactivate
+conda env remove --name ultralytics-env --yes
+
+# Fix the corrupted conda metadata first
+conda clean --all -y
+
+# Rebuild fresh
+conda create --name ultralytics-env python=3.13 -y
+conda activate ultralytics-env
+
+# Install ultralytics
+conda install -c conda-forge ultralytics -y
+
+# Install pytorch AND torchvision together this time (important - do both at once)
+conda install -c pytorch pytorch torchvision cpuonly -y
+
+# Restore picamera2 access
+echo '/usr/lib/python3/dist-packages' > ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
