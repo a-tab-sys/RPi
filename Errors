@@ -1100,3 +1100,26 @@ Traceback (most recent call last):
     import torch.distributed as dist
 ModuleNotFoundError: No module named 'torch'
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+
+///////////////////////////////////////////////////////////////
+# Patch all 'import torch.X as Y' style imports in torch_utils.py
+sed -i 's/^import torch$/try:\n    import torch\nexcept (ImportError, Exception):\n    torch = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py
+
+sed -i 's/^import torch\.\(.*\) as \(.*\)$/try:\n    import torch.\1 as \2\nexcept (ImportError, Exception):\n    \2 = None/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py
+
+
+
+grep -n "^import torch" ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py
+
+
+
+
+python3 -c "import ultralytics; print('ultralytics OK')"
+
+
+
+
+# Patch all 'import torch.X as Y' lines across all files
+grep -rl "^import torch\." ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/ | xargs sed -i 's/^import torch\.\(.*\) as \(.*\)$/try:\n    import torch.\1 as \2\nexcept (ImportError, Exception):\n    \2 = None/'
