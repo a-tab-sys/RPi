@@ -1235,3 +1235,71 @@ python3 -c "import numpy; print(numpy.__version__)"
 
 # Then back in Conda env, match it
 conda install numpy=X.X.X -y
+
+
+
+//////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import torchvision; print(torchvision.__version__)"Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import torchvision; print(torchvision.__version__)
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'torchvision' has no attribute '__version__'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ conda install -c pytorch torchvision cpuonly -y
+
+CorruptedEnvironmentError: The target environment has been corrupted. Corrupted environments most commonly
+occur when the conda process is force-terminated while in an unlink-link
+transaction.
+  environment location: /home/atab-rpi/miniforge3/envs/ultralytics-env
+  corrupted file: /home/atab-rpi/miniforge3/envs/ultralytics-env/conda-meta/libuv-1.51.0-he30d5cf_1.json
+
+
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from ultralytics import YOLO; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1463, in <module>
+    SETTINGS = SettingsManager()  # initialize settings
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1342, in __init__
+    from ultralytics.utils.torch_utils import torch_distributed_zero_first
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py", line 35, in <module>
+    from ultralytics.utils.checks import check_version
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/checks.py", line 1049, in <module>
+    check_torchvision()  # check torch-torchvision compatibility
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/checks.py", line 560, in check_torchvision
+    v_torchvision = ".".join(TORCHVISION_VERSION.split("+", 1)[0].split(".")[:2])
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'split'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ conda install -c conda-forge ultralytics -y
+
+CorruptedEnvironmentError: The target environment has been corrupted. Corrupted environments most commonly
+occur when the conda process is force-terminated while in an unlink-link
+transaction.
+  environment location: /home/atab-rpi/miniforge3/envs/ultralytics-env
+  corrupted file: /home/atab-rpi/miniforge3/envs/ultralytics-env/conda-meta/libuv-1.51.0-he30d5cf_1.json
+
+
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from ultralytics import YOLO; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1463, in <module>
+    SETTINGS = SettingsManager()  # initialize settings
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1342, in __init__
+    from ultralytics.utils.torch_utils import torch_distributed_zero_first
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py", line 35, in <module>
+    from ultralytics.utils.checks import check_version
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/checks.py", line 1049, in <module>
+    check_torchvision()  # check torch-torchvision compatibility
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/checks.py", line 560, in check_torchvision
+    v_torchvision = ".".join(TORCHVISION_VERSION.split("+", 1)[0].split(".")[:2])
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'split'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
