@@ -1325,3 +1325,9 @@ conda install -c pytorch pytorch torchvision cpuonly -y
 
 # Restore picamera2 access
 echo '/usr/lib/python3/dist-packages' > ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+
+
+python3 -c "import torch; print('torch:', torch.__version__)"
+python3 -c "import torchvision; print('torchvision:', torchvision.__version__)"
+python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
+python3 -c "from ultralytics import YOLO; print('ultralytics OK')"
