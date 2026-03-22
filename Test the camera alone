@@ -260,3 +260,16 @@ ModuleNotFoundError: No module named 'picamera2'
 
 
 
+////////////////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ echo '/usr/lib/python3/dist-packages' > ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/system-packages.pth
+(ultralytics-env) atab-rpi@atab-rpi:~ $ ls /usr/lib/python3/dist-packages/ | grep picamera
+picamera2
+picamera2-0.3.34.egg-info
+(ultralytics-env) atab-rpi@atab-rpi:~ $ ^C
+(ultralytics-env) atab-rpi@atab-rpi:~ $ ^C
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "from picamera2 import Picamera2; print('picamera2 OK')"
+picamera2 OK
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+
