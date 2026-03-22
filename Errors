@@ -1081,3 +1081,22 @@ sed -i 's/warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)/if
 sed -i 's/torch.save = torch_save/if torch is not None: torch.save = torch_save/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
 
 python3 -c "import ultralytics; print('ultralytics OK')"
+
+
+////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/torch.save = torch_save/if torch is not None: torch.save = torch_save/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1466, in <module>
+    SETTINGS = SettingsManager()  # initialize settings
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 1345, in __init__
+    from ultralytics.utils.torch_utils import torch_distributed_zero_first
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/torch_utils.py", line 22, in <module>
+    import torch.distributed as dist
+ModuleNotFoundError: No module named 'torch'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
