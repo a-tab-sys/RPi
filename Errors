@@ -1040,3 +1040,19 @@ AttributeError: 'NoneType' object has no attribute 'set_printoptions'
 sed -i 's/torch.set_printoptions(linewidth=320, precision=4, profile="default")/if torch is not None: torch.set_printoptions(linewidth=320, precision=4, profile="default")/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
 
 python3 -c "import ultralytics; print('ultralytics OK')"
+
+
+//////////////////////////////////////////
+(ultralytics-env) atab-rpi@atab-rpi:~ $ sed -i 's/torch.set_printoptions(linewidth=320, precision=4, profile="default")/if torch is not None: torch.set_printoptions(linewidth=320, precision=4, profile="default")/' ~/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py
+(ultralytics-env) atab-rpi@atab-rpi:~ $ python3 -c "import ultralytics; print('ultralytics OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ultralytics; print('ultralytics OK')
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/__init__.py", line 13, in <module>
+    from ultralytics.utils import ASSETS, SETTINGS
+  File "/home/atab-rpi/miniforge3/envs/ultralytics-env/lib/python3.13/site-packages/ultralytics/utils/__init__.py", line 144, in <module>
+    warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)  # ONNX/TorchScript export tracer warnings
+                                               ^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'jit'
+(ultralytics-env) atab-rpi@atab-rpi:~ $ 
