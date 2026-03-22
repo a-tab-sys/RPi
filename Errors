@@ -195,3 +195,20 @@ print('YOLO26n NCNN loaded successfully — no PyTorch needed!')
 "
 Illegal instruction
 (ultralytics-env) atab-rpi@atab-rpi:~ $ 
+
+
+//////////////////////////////
+python3 -c "print('step 1')"
+python3 -c "import ultralytics; print('step 2')"
+python3 -c "from ultralytics import YOLO; print('step 3')"
+
+
+pip show ultralytics
+
+
+# Remove Conda version
+conda remove ultralytics -y
+
+# Install from pip (uses pure Python wheels, no compiled extensions)
+pip install ultralytics --no-deps
+pip install numpy pillow pyyaml tqdm psutil requests ultralytics-thop
