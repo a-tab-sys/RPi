@@ -551,6 +551,9 @@ def perception_thread(state: SharedState, stop_event: threading.Event):
 
         # Convert RGB → BGR once here. All downstream code (YOLO, overlay) uses BGR.
         frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+        
+        # Fix mirrored camera image
+        frame = cv2.flip(frame, 1)
 
         bbox = detector.detect(frame)
         state.update(bbox, frame)
