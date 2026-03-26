@@ -871,3 +871,24 @@ def main():
 # Only runs main() when this file is executed directly (not when imported).
 if __name__ == '__main__':
     main()
+
+
+
+//////////////////////////////////////////////
+
+>>> %Run check_MSP_packets_reaching_FC.py
+[MSP] Heartbeat thread started at 50 Hz
+[0:15:59.099142390] [2435]  INFO Camera camera_manager.cpp:340 libcamera v0.7.0+rpt20260205
+[0:15:59.114697316] [2436]  INFO RPI pisp.cpp:720 libpisp version 1.3.0
+[0:15:59.125944872] [2436]  INFO IPAProxy ipa_proxy.cpp:180 Using tuning file /usr/share/libcamera/ipa/rpi/pisp/ov5647.json
+[0:15:59.133243705] [2436]  INFO Camera camera_manager.cpp:223 Adding camera '/base/axi/pcie@1000120000/rp1/i2c@88000/ov5647@36' for pipeline handler rpi/pisp
+[0:15:59.133276260] [2436]  INFO RPI pisp.cpp:1181 Registered camera /base/axi/pcie@1000120000/rp1/i2c@88000/ov5647@36 to CFE device /dev/media0 and ISP device /dev/media1 using PiSP variant BCM2712_C0
+[CTRL] Sending ARM + ANGLE command…
+[0:15:59.137379038] [2435]  INFO Camera camera.cpp:1215 configuring streams: (0) 640x480-RGB888/sRGB (1) 640x480-GBRG_PISP_COMP1/RAW
+[0:15:59.137483242] [2436]  INFO RPI pisp.cpp:1485 Sensor: /base/axi/pcie@1000120000/rp1/i2c@88000/ov5647@36 - Selected sensor format: 640x480-SGBRG10_1X10/RAW - Selected CFE format: 640x480-PC1g/RAW
+[CTRL] Armed. Follow mode active. Press Ctrl+C to disarm.
+[CTRL] Test limits: ±50 counts | Hover throttle: 1050
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Python 3.13.12 (/home/atab-rpi/miniforge3/envs/ultralytics-env/bin/python3)
+>>> 
