@@ -1,0 +1,24 @@
+atab-rpi@atab-rpi:~ $ sudo systemctl status ssh
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/usr/lib/systemd/system/ssh.service; enabled; preset: enab>
+     Active: active (running) since Sun 2026-03-22 10:36:41 EDT; 11min ago
+ Invocation: a221ee061f694c7bb4d0d04c1bc46ca1
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+   Main PID: 1324 (sshd)
+      Tasks: 1 (limit: 9570)
+        CPU: 40ms
+     CGroup: /system.slice/ssh.service
+             └─1324 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+
+Mar 22 10:36:41 atab-rpi systemd[1]: Starting ssh.service - OpenBSD Secure Shel>
+Mar 22 10:36:41 atab-rpi sshd[1324]: Server listening on 0.0.0.0 port 22.
+Mar 22 10:36:41 atab-rpi sshd[1324]: Server listening on :: port 22.
+Mar 22 10:36:41 atab-rpi systemd[1]: Started ssh.service - OpenBSD Secure Shell>
+
+atab-rpi@atab-rpi:~ $ sudo ss -tlnp | grep 22
+LISTEN 0      128          0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=1324,fd=6))                           
+LISTEN 0      128             [::]:22           [::]:*    users:(("sshd",pid=1324,fd=7))                           
+atab-rpi@atab-rpi:~ $ sudo ufw status
+sudo: ufw: command not found
+atab-rpi@atab-rpi:~ $ 
