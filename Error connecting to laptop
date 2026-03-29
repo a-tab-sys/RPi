@@ -50,3 +50,26 @@ sudo nmcli dev wifi connect "Atab-rpi" password "Atab-rpi" -- 802-11-wireless-se
 sudo nmcli con add type wifi ifname wlan0 con-name "Atab-rpi" ssid "Atab-rpi" \
   wifi-sec.key-mgmt wpa-psk wifi-sec.psk "Atab-rpi" \
   && sudo nmcli con up "Atab-rpi"
+
+
+///////////////////////////////
+atab-rpi@atab-rpi:~ $ sudo nmcli dev wifi connect "Atab-rpi" password "Atab-rpi"
+Error: 802-11-wireless-security.key-mgmt: property is missing.
+atab-rpi@atab-rpi:~ $ ^C
+atab-rpi@atab-rpi:~ $ ^C
+atab-rpi@atab-rpi:~ $ ^C
+atab-rpi@atab-rpi:~ $ nmcli dev status
+DEVICE         TYPE      STATE                   CONNECTION 
+wlan0          wifi      connected               eduroam    
+lo             loopback  connected (externally)  lo         
+p2p-dev-wlan0  wifi-p2p  disconnected            --         
+eth0           ethernet  unavailable             --         
+atab-rpi@atab-rpi:~ $ sudo nmcli dev wifi connect "Atab-rpi" password "Atab-rpi" -- 802-11-wireless-security.key-mgmt wpa-psk
+Error: invalid extra argument '--'.
+atab-rpi@atab-rpi:~ $ sudo nmcli con add type wifi ifname wlan0 con-name "Atab-rpi" ssid "Atab-rpi" \
+  wifi-sec.key-mgmt wpa-psk wifi-sec.psk "Atab-rpi" \
+  && sudo nmcli con up "Atab-rpi"
+Warning: There is another connection with the name 'Atab-rpi'. Reference the connection by its uuid '15b2e000-1608-410d-a497-6dfa28f10aaf'
+Connection 'Atab-rpi' (15b2e000-1608-410d-a497-6dfa28f10aaf) successfully added.
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/11)
+
