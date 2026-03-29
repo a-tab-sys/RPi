@@ -22,6 +22,7 @@ LISTEN 0      128             [::]:22           [::]:*    users:(("sshd",pid=132
 atab-rpi@atab-rpi:~ $ sudo ufw status
 sudo: ufw: command not found
 atab-rpi@atab-rpi:~ $ 
+
 ///////////////////////////////////////////////
 atab-rpi@atab-rpi:~ $ ^[[200~sudo nmcli device wifi connect "Galaxy S25 FE DCOE" password "xwy4yve7zxkkus5"
 bash: $'\E[200~sudo': command not found
@@ -29,3 +30,9 @@ atab-rpi@atab-rpi:~ $ ~sudo nmcli device wifi connect "Galaxy S25 FE DC0E" passw
 bash: ~sudo: command not found
 atab-rpi@atab-rpi:~ $ sudo nmcli device wifi connect "Galaxy S25 FE DC0E" password "xwy4yve7zxkkus5"
 Error: No network with SSID 'Galaxy S25 FE DC0E' found.
+
+///////////////////
+atab-rpi@atab-rpi:~ $ sudo nmcli device wifi connect "Atab-rpi" password "Atab-rpi"
+Error: 802-11-wireless-security.key-mgmt: property is missing.
+atab-rpi@atab-rpi:~ $ sudo nmcli device wifi connect "Atab-rpi" password "Atab-rpi"
+Error: 802-11-wireless-security.key-mgmt: property is missing.
