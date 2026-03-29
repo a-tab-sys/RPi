@@ -73,3 +73,14 @@ Warning: There is another connection with the name 'Atab-rpi'. Reference the con
 Connection 'Atab-rpi' (15b2e000-1608-410d-a497-6dfa28f10aaf) successfully added.
 Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/11)
 
+
+////////////////////////////////////
+atab-rpi@atab-rpi:~ $ hostname -I
+10.160.21.201 
+atab-rpi@atab-rpi:~ $ nmcli con show --active
+NAME     UUID                                  TYPE      DEVICE 
+eduroam  e3482555-cb08-4c17-a077-c404040cabc2  wifi      wlan0  
+lo       c933ebe0-ef67-45fd-b9e9-68261519c5a0  loopback  lo     
+atab-rpi@atab-rpi:~ $ 
+
+
