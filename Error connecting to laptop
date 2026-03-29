@@ -119,3 +119,8 @@ Atab-rpi  15b2e000-1608-410d-a497-6dfa28f10aaf  wifi      wlan0
 lo        c933ebe0-ef67-45fd-b9e9-68261519c5a0  loopback  lo     
 atab-rpi@atab-rpi:~ $ 
 
+
+/////////////////////////////
+atab-rpi@atab-rpi:~ $ hostname -I
+10.154.59.173 
+
