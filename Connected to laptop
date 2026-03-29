@@ -1,0 +1,832 @@
+"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Autonomous Person-Following Drone
+  Hardware: Raspberry Pi 4B + Pi Camera Module (15-pin CSI)
+            + iFlight BLITZ F745 Flight Controller
+  Comms:    MSP (MultiWii Serial Protocol) over UART
+            /dev/ttyS0 at 115200 baud
+
+  !! TESTING VERSION !!
+  All movement values are intentionally kept very small.
+  The drone will respond slowly and gently so you can verify
+  logic and direction before increasing any values.
+  Search for "TESTING" comments to find every value to tune up
+  once you are happy the logic is correct.
+
+  ── QUICK TESTING GUIDE ──────────────────────────────────
+  Step 1: Set TEST_CAMERA_ONLY = True  (bottom of config)
+          Run the script. Stand in front of camera.
+          Verify the orange bounding box tracks you correctly.
+          Check eX/eY/eH error values on screen make sense.
+          No serial port or FC needed for this step.
+
+  Step 2: Set TEST_CAMERA_ONLY = False
+          Connect FC via UART. Props OFF.
+          Run script and open Betaflight Configurator on PC.
+          Watch Receiver tab — channel bars should move as
+          you walk in front of the camera.
+          Verify direction of each axis is correct.
+
+  Step 3: Props ON, tethered. Tune HOVER_THROTTLE.
+          Then gradually increase MAX_DEFLECTION.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTE — NO TRANSMITTER/RECEIVER:
+  The Pi is the ONLY controller. There is no manual fallback.
+  The software kill switch (Ctrl+C) and DETECTION_TIMEOUT
+  safety hover are your only safety mechanisms.
+  Keep the drone tethered or over a soft surface during all
+  early testing.
+
+HOW THE PROGRAM FLOWS (big picture):
+─────────────────────────────────────
+  Thread 1 — MSPSender._loop()
+      Runs non-stop at 50 Hz.
+      Every 20ms it grabs the latest channel values and
+      sends them to the flight controller over serial.
+      This thread NEVER pauses for camera work — if it did,
+      Betaflight would see a gap in RC packets and trigger
+      failsafe (motors cut, drone drops).
+
+  Thread 2 — perception_thread()
+      Captures frames from the CSI camera.
+      Runs YOLO (or HOG fallback) on each frame.
+      Writes the detected bounding box into SharedState.
+      Runs as fast as the detector allows (~5–30 FPS).
+
+  Main thread — main()
+      Reads the latest bounding box from SharedState.
+      Calculates how far off-centre the person is.
+      Feeds those errors into three PID controllers.
+      Writes resulting RC channel values to MSPSender
+      so Thread 1 can send them.
+      Also draws the debug overlay on screen.
+"""
+
+# ── Standard library imports ──────────────────────────────────────────────────
+import time        # time.time() for timestamps, time.sleep() for pacing
+import threading   # Lets us run camera + serial in parallel
+import struct      # Packs Python numbers into raw bytes for the serial packet
+import serial      # PySerial: talks to the flight controller over UART
+
+# ── Third-party imports ───────────────────────────────────────────────────────
+import cv2                     # OpenCV: drawing, colour conversion, display
+import numpy as np             # NumPy: fast array ops (used by OpenCV/YOLO internally)
+from collections import deque  # deque: fixed-length list used for FPS averaging
+from picamera2 import Picamera2  # Official Pi CSI camera library
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SECTION 1 — CONFIGURATION
+#  All the numbers you might want to tweak are here in one place.
+#  Values marked [TESTING] are intentionally conservative.
+#  Values marked [TUNE LATER] should be adjusted once logic is verified.
+# ══════════════════════════════════════════════════════════════════════════════
+
+SERIAL_PORT = '/dev/ttyS0'   # GPIO UART on Pi 4B. Serial console must be
+                              # DISABLED in raspi-config or this won't work.
+BAUD_RATE   = 115200          # Must match Betaflight Ports tab setting.
+
+FRAME_W     = 640             # Camera capture width  (pixels)
+FRAME_H     = 480             # Camera capture height (pixels)
+FPS_TARGET  = 30              # Requested FPS from the camera sensor
+
+# RC channel range — the language of flight controllers.
+# These are NOT speeds — they are positions on a scale:
+#   1000 = full left / down / back / minimum
+#   1500 = centred / neutral / do nothing  ← this is the "zero" point
+#   2000 = full right / up / forward / maximum
+# Throttle is the exception: 1000=motors off, 1500=half power, 2000=full power
+RC_MIN = 1000
+RC_MID = 1500   # Neutral — drone does nothing on this axis
+RC_MAX = 2000
+
+# ── [TESTING] Throttle hover value ────────────────────────────────────────────
+# The throttle value sent when holding position / not tracking anyone.
+# 1050 = barely above minimum. Motors spin but drone won't lift.
+# This is intentionally low for bench testing with props on.
+# [TUNE LATER] Increase slowly until drone just barely lifts, then use that value.
+HOVER_THROTTLE = 1050
+
+# ── [TESTING] Maximum stick deflection from neutral ───────────────────────────
+# All PID outputs are clamped to RC_MID ± this value.
+# 50 counts either side of 1500 means commands stay between 1450 and 1550.
+# This keeps all drone movements tiny and slow during testing.
+# Example: yaw fully left = 1450, yaw fully right = 1550 (barely moves)
+# [TUNE LATER] Increase to 200–400 for real follow flight
+MAX_DEFLECTION = 50
+
+# Derived min/max used by PID controllers — calculated from the above
+RC_TEST_MIN = RC_MID - MAX_DEFLECTION   # = 1450
+RC_TEST_MAX = RC_MID + MAX_DEFLECTION   # = 1550
+
+# Safety: seconds without a person detected before switching to hover-in-place
+DETECTION_TIMEOUT = 1.0   # seconds
+
+# Target bounding-box HEIGHT in pixels — represents your desired follow distance.
+# If the detected box is TALLER than this → person too close → drone backs up.
+# If the detected box is SHORTER than this → person too far → drone moves forward.
+# [TUNE LATER] based on how far back you want the drone to follow from
+TARGET_BB_HEIGHT = 200    # pixels
+
+# ── TEST_CAMERA_ONLY flag ──────────────────────────────────────────────────────
+# True  → Run camera and detection ONLY. No serial port opened, no MSP packets
+#         sent, no FC needed. Use this first to verify your camera works and
+#         that person detection is tracking you correctly on screen.
+#
+# False → Full mode. Opens serial port, arms the FC, sends live MSP commands.
+#         Only switch to this after camera-only mode looks correct.
+#
+# !! CHANGE ONLY THIS ONE LINE to switch between test and flight mode !!
+TEST_CAMERA_ONLY = True
+
+# ── SHOW_DEBUG_WINDOW flag ────────────────────────────────────────────────────
+# True  → Show the OpenCV camera window with bounding box overlay.
+#         Use this when a monitor is connected (e.g. at your desk).
+#
+# False → No window. Terminal output only.
+#         MUST be False when running over SSH with no monitor connected.
+#         cv2.imshow() will crash if there is no display available.
+SHOW_DEBUG_WINDOW = True
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SECTION 2 — PID CONTROLLER
+#
+#  A PID controller is a feedback loop that reduces an "error" to zero.
+#  Each axis of the drone has its own independent PID:
+#
+#    YAW PID:      error = pixels the person is LEFT or RIGHT of frame centre
+#                  output = rotate drone left or right to re-centre them
+#
+#    PITCH PID:    error = difference between actual and target bbox height
+#                  output = fly forward or backward to maintain distance
+#
+#    THROTTLE PID: error = pixels the person is ABOVE or BELOW frame centre
+#                  output = climb or descend to keep them vertically centred
+#
+#  P = react to current error        (bigger error → bigger correction)
+#  I = react to accumulated error    (fixes slow persistent drift)
+#  D = react to rate of error change (dampens overshoot/oscillation)
+# ══════════════════════════════════════════════════════════════════════════════
+
+class PID:
+    def __init__(self, kp, ki, kd, output_min, output_max, integral_limit=50):
+        """
+        kp, ki, kd      — The three gains. Tune kp first with ki=0 and kd=0,
+                          then add kd to dampen oscillation, then tiny ki last.
+        output_min/max  — Clamps result to stay within the allowed RC range.
+                          During testing these are RC_TEST_MIN/MAX (1450–1550).
+        integral_limit  — Prevents integral windup: stops the I term growing
+                          unboundedly if the drone can't reach its target.
+        """
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.output_min     = output_min
+        self.output_max     = output_max
+        self.integral_limit = integral_limit
+
+        # Internal state — these accumulate between calls
+        self._integral   = 0.0   # Running sum of (error × dt)
+        self._prev_error = 0.0   # Previous loop's error, needed for D term
+        self._prev_time  = None  # Timestamp of last call, needed to compute dt
+
+    def compute(self, error: float) -> float:
+        """
+        Call every loop with the current error value.
+        Returns an RC channel value between output_min and output_max.
+
+        'error' is in pixels (e.g. person is 80px right of centre = +80).
+        The PID turns that into an RC value (e.g. 1520 = slight right yaw).
+        Zero error → returns exactly RC_MID (1500) → no movement.
+        """
+        now = time.time()
+
+        # dt = seconds since last call.
+        # First call assumes 20ms (50Hz). Clamp to avoid division-by-zero.
+        dt = (now - self._prev_time) if self._prev_time else 0.02
+        dt = max(dt, 1e-6)
+        self._prev_time = now
+
+        # ── P term ── react to current error ──────────────────────────────────
+        p_term = self.kp * error
+
+        # ── I term ── react to accumulated error over time ────────────────────
+        # Builds up slowly when there's a persistent offset the P term alone
+        # can't fully correct. Clamped to prevent runaway windup.
+        self._integral += error * dt
+        self._integral  = max(-self.integral_limit,
+                               min(self.integral_limit, self._integral))
+        i_term = self.ki * self._integral
+
+        # ── D term ── react to how fast the error is changing ─────────────────
+        # Adds extra push when error is growing fast.
+        # Backs off early when error is shrinking — prevents overshoot.
+        derivative = (error - self._prev_error) / dt
+        self._prev_error = error
+        d_term = self.kd * derivative
+
+        # ── Combine all three terms, offset by RC_MID ─────────────────────────
+        # RC_MID (1500) is the "do nothing" baseline.
+        # Zero error → p+i+d = 0 → output = exactly 1500 → no movement.
+        raw_output = RC_MID + p_term + i_term + d_term
+
+        # Clamp to the allowed range (very tight during testing)
+        return float(max(self.output_min, min(self.output_max, raw_output)))
+
+    def reset(self):
+        """
+        Call when drone loses sight of the person.
+        Clears the I term and previous error so the PID starts fresh
+        when the person reappears — prevents a sudden lurch caused by
+        stale accumulated data.
+        """
+        self._integral   = 0.0
+        self._prev_error = 0.0
+        self._prev_time  = None
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SECTION 3 — MSP COMMUNICATION
+#
+#  MSP (MultiWii Serial Protocol) is how Betaflight accepts RC commands.
+#  We use command ID 200 = MSP_SET_RAW_RC, which lets the Pi pretend to BE
+#  a radio receiver and push 8 channel values directly to the FC.
+#
+#  Packet structure:
+#    $ M < [size] [msg_id] [payload: 8 × uint16 little-endian] [checksum]
+#
+#  Channel order: [Roll, Pitch, Throttle, Yaw, AUX1, AUX2, AUX3, AUX4]
+#  All values 1000–2000.
+#
+#  IMPORTANT — 50 Hz heartbeat:
+#  Betaflight expects RC packets every 20ms. If they stop, it triggers
+#  RXLOSS failsafe (motors cut). The MSPSender thread ensures packets
+#  keep flowing even if camera/detection is slow.
+#
+#  NOTE: This entire class is only instantiated when TEST_CAMERA_ONLY = False.
+# ══════════════════════════════════════════════════════════════════════════════
+
+class MSPSender:
+    """
+    Owns the serial port and maintains a 50 Hz heartbeat in a background thread.
+    The main thread only needs to call set_channels() with new values —
+    the thread handles the timing and actual byte transmission.
+    """
+
+    def __init__(self, port: str, baud: int):
+        # Open UART serial port in non-blocking mode
+        self.ser = serial.Serial(
+            port=port, baudrate=baud,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS,
+            timeout=0, write_timeout=0   # Non-blocking: never waits
+        )
+
+        # Safe default: centred sticks, zero throttle, disarmed
+        # [Roll, Pitch, Throttle, Yaw, AUX1(arm), AUX2(angle), AUX3, AUX4]
+        self._channels = [RC_MID, RC_MID, RC_MIN, RC_MID,
+                          RC_MIN, RC_MIN, RC_MID, RC_MID]
+
+        # Lock protects _channels from simultaneous read/write between threads
+        self._lock    = threading.Lock()
+        self._running = False
+        self._thread  = None
+
+    @staticmethod
+    def _build_packet(channels) -> bytes:
+        """
+        Assembles a raw MSP_SET_RAW_RC byte packet from 8 channel values.
+
+        struct.pack('<' + 'H' * 8):
+          '<' = little-endian byte order (LSB first, as MSP requires)
+          'H' = unsigned short = 2 bytes per channel value
+        Checksum = XOR of size, msg_id, and every byte in the payload.
+        The FC uses this checksum to detect corrupted packets.
+        """
+        header   = b'$M<'
+        size     = len(channels) * 2      # 8 channels × 2 bytes = 16
+        msg_id   = 200                    # MSP_SET_RAW_RC command ID
+        payload  = struct.pack('<' + 'H' * len(channels), *channels)
+        checksum = size ^ msg_id
+        for b in payload:
+            checksum ^= b
+        return header + struct.pack('<BB', size, msg_id) + payload + struct.pack('<B', checksum)
+
+    def set_channels(self, channels):
+        """
+        Called by the main thread to update what gets sent in the next packet.
+        Lock ensures the serial thread never reads a half-written list.
+        Every value clamped to [RC_MIN, RC_MAX] as a final safety net.
+        """
+        with self._lock:
+            self._channels = [int(max(RC_MIN, min(RC_MAX, c))) for c in channels]
+
+    def get_channels(self):
+        """Returns a snapshot of current channel values (used by debug overlay)."""
+        with self._lock:
+            return list(self._channels)
+
+    def _loop(self):
+        """
+        Background thread body. Fires every 20ms (50 Hz).
+        Completely independent of camera speed — this is the core safety design.
+        Even if YOLO takes 200ms on a frame, the FC keeps receiving packets.
+        """
+        while self._running:
+            loop_start = time.time()
+
+            with self._lock:
+                ch = list(self._channels)   # Thread-safe snapshot
+
+            try:
+                self.ser.write(self._build_packet(ch))
+            except serial.SerialException as e:
+                print(f"[SERIAL ERROR] {e}")
+
+            # Precision sleep: subtract actual execution time from 20ms target
+            elapsed = time.time() - loop_start
+            sleep_t = 0.02 - elapsed
+            if sleep_t > 0:
+                time.sleep(sleep_t)
+
+    def start(self):
+        """Launches the 50 Hz serial background thread."""
+        self._running = True
+        self._thread  = threading.Thread(target=self._loop, daemon=True)
+        # daemon=True: thread dies automatically when main() exits
+        self._thread.start()
+        print("[MSP] Heartbeat thread started at 50 Hz")
+
+    def stop(self):
+        """Signals the loop to stop and closes the serial port cleanly."""
+        self._running = False
+        if self._thread:
+            self._thread.join(timeout=1)
+        self.ser.close()
+        print("[MSP] Serial port closed")
+
+    def disarm(self):
+        """
+        Emergency disarm — bypasses the thread and directly blasts 20 disarm
+        packets over 200ms. Used during shutdown/Ctrl+C.
+        AUX1 = RC_MIN (1000) = disarmed in Betaflight.
+        Throttle = RC_MIN (1000) = zero throttle.
+        """
+        disarm_ch = [RC_MID, RC_MID, RC_MIN, RC_MID,
+                     RC_MIN, RC_MIN, RC_MID, RC_MID]
+        for _ in range(20):
+            try:
+                self.ser.write(self._build_packet(disarm_ch))
+            except Exception:
+                pass
+            time.sleep(0.01)
+        print("[MSP] Disarm signal sent")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SECTION 4 — PERSON DETECTOR
+#
+#  Tries YOLOv8-nano first (accurate neural network, ~6MB model file).
+#  Automatically falls back to HOG+SVM (built into OpenCV, no extra install)
+#  if the ultralytics package is not installed.
+#
+#  Output is always: (x, y, w, h) bounding box of the largest person, or None.
+#    x, y = top-left corner of the box in pixels
+#    w    = width of the box in pixels
+#    h    = height of the box in pixels  ← used as distance proxy
+# ══════════════════════════════════════════════════════════════════════════════
+
+class PersonDetector:
+    """
+    Detects people using YOLO26n in NCNN format via the ultralytics library.
+
+    WHY YOLO26n NCNN:
+    - YOLO26n is specifically designed for edge/embedded devices like the Pi
+    - NCNN format runs in pure C++ with no PyTorch needed at runtime
+    - ~10-15 FPS on Pi 5 — fast enough for person following
+    - 40.1 mAP accuracy — better than YOLOv8n (37.3) or YOLO11n (39.5)
+
+    HOW IT WORKS:
+    - ultralytics loads the NCNN model and handles all the inference details
+    - We filter results to class 0 (person) only
+    - We return the LARGEST detected person box — largest area = closest person
+      which is almost always the one we want to follow
+    - Returns (x, y, w, h) where x,y is top-left corner, w/h are box dimensions
+    - Returns None if no person is visible
+    """
+
+    # Path to the exported NCNN model folder
+    # This folder contains model.ncnn.param and model.ncnn.bin
+    NCNN_MODEL_PATH = '/home/atab-rpi/yolo26n_ncnn_model'
+
+    def __init__(self):
+        self._use_yolo = False
+        try:
+            from ultralytics import YOLO
+
+            # Load YOLO26n NCNN model
+            # task='detect' suppresses the "unable to guess task" warning
+            # since NCNN models don't embed task metadata
+            self.model = YOLO(self.NCNN_MODEL_PATH, task='detect')
+            self._use_yolo = True
+            print("[VISION] YOLO26n NCNN loaded via ultralytics")
+
+        except Exception as e:
+            # ── Fallback to HOG+SVM ───────────────────────────────────────────
+            # Built into OpenCV, no model files needed.
+            # Slower and less accurate but works without any model files.
+            print(f"[VISION] YOLO load failed ({e}), falling back to HOG+SVM")
+            self.hog = cv2.HOGDescriptor()
+            self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+            print("[VISION] HOG+SVM detector loaded")
+
+    def detect(self, frame):
+        """Public interface. Returns (x, y, w, h) of largest person, or None."""
+        return self._detect_yolo(frame) if self._use_yolo else self._detect_hog(frame)
+
+    def _detect_yolo(self, frame):
+        """
+        Run YOLO26n inference, filter to person class, return largest box.
+
+        results[0].boxes gives all detections in this frame.
+        box.xyxy[0] = [x1, y1, x2, y2] — top-left and bottom-right corners.
+        box.cls[0]  = class index (0 = person).
+        We convert xyxy → xywh format to match what the rest of the code expects.
+        """
+        # classes=[0] tells YOLO to only detect persons, skipping all other classes.
+        # verbose=False suppresses per-frame console output.
+        results = self.model(frame, classes=[0], verbose=False)
+
+        best, best_area = None, 0
+        for r in results:
+            for box in r.boxes:
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                w, h = x2 - x1, y2 - y1
+                area = w * h
+                # Keep the largest box — that's the closest/most prominent person
+                if area > best_area:
+                    best_area = area
+                    best = (x1, y1, w, h)
+        return best
+
+    def _detect_hog(self, frame):
+        """
+        HOG+SVM fallback. Shrinks frame to 320×240 for speed, then scales
+        bounding box coordinates back to original resolution.
+        """
+        small = cv2.resize(frame, (320, 240))
+        rects, _ = self.hog.detectMultiScale(
+            small,
+            winStride=(8, 8),   # Pixels to step between detection windows
+            padding=(4, 4),     # Border padding around each window
+            scale=1.05          # Multi-scale pyramid step
+        )
+        if len(rects) == 0:
+            return None
+        scale_x = frame.shape[1] / 320
+        scale_y = frame.shape[0] / 240
+        best = max(rects, key=lambda r: r[2] * r[3])
+        x, y, w, h = best
+        return (int(x*scale_x), int(y*scale_y),
+                int(w*scale_x), int(h*scale_y))
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SECTION 5 — SHARED STATE
+#
+#  Thread-safe handoff between the camera thread and the main thread.
+#  The Lock prevents a race condition: without it, the main thread could read
+#  a bounding box that the camera thread is halfway through writing, producing
+#  corrupted mixed old/new values and unpredictable drone behaviour.
+# ══════════════════════════════════════════════════════════════════════════════
+
+class SharedState:
+    def __init__(self):
+        self._lock           = threading.Lock()
+        self.bbox            = None    # Latest (x, y, w, h) or None
+        self.last_detection  = 0.0    # Timestamp of most recent successful detection
+        self.frame_for_debug = None   # Latest BGR camera frame for overlay drawing
+
+    def update(self, bbox, frame=None):
+        """Called by the camera thread every frame."""
+        with self._lock:
+            self.bbox = bbox
+            if bbox:
+                # Only update timestamp when someone is actually visible
+                self.last_detection = time.time()
+            if frame is not None:
+                # Store a COPY so the main thread isn't affected by future writes
+                self.frame_for_debug = frame.copy()
+
+    def read(self):
+        """Called by the main thread. Returns a consistent atomic snapshot."""
+        with self._lock:
+            return self.bbox, self.last_detection, self.frame_for_debug
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SECTION 6 — PERCEPTION THREAD
+#
+#  Runs in the background: captures frames, detects people, posts to SharedState.
+#  Kept separate from the main loop so slow detection never blocks the
+#  50 Hz MSP heartbeat.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def perception_thread(state: SharedState, stop_event: threading.Event):
+    """
+    stop_event is set by main() during shutdown.
+    When set, this function exits its loop and releases the camera cleanly.
+    """
+    # ── Initialise CSI camera via picamera2 ───────────────────────────────────
+    picam2 = Picamera2(0)  # Explicitly select camera index 0
+    config = picam2.create_preview_configuration(
+        main={"size": (FRAME_W, FRAME_H), "format": "RGB888"}
+        # RGB888 = 8-bit per channel, RGB colour order
+        # picamera2 native format — converted to BGR for OpenCV below
+    )
+    picam2.configure(config)
+    picam2.start()
+    time.sleep(0.5)   # Allow sensor to auto-expose before detection begins
+
+    detector = PersonDetector()
+    print("[VISION] CSI camera started, detection running…")
+
+    while not stop_event.is_set():
+        # capture_array() → NumPy array (H × W × 3), RGB colour order
+        frame_rgb = picam2.capture_array()
+
+        # Convert RGB → BGR once here. All downstream code (YOLO, overlay) uses BGR.
+        frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+
+        bbox = detector.detect(frame)
+        state.update(bbox, frame)
+
+    picam2.stop()
+    print("[VISION] CSI camera stopped")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SECTION 7 — MAIN CONTROL LOOP
+# ══════════════════════════════════════════════════════════════════════════════
+
+def main():
+
+    # ── Create three PID controllers — one per movement axis ─────────────────
+    # [TESTING] All gains are tiny and output range is ±MAX_DEFLECTION (±50).
+    # The drone will respond very gently to make it safe to verify logic first.
+    # [TUNE LATER] Raise kp once direction of each axis is confirmed correct.
+
+    yaw_pid = PID(
+        kp=0.05,  # [TESTING] Very gentle yaw. Real flight: ~0.8
+        ki=0.0,   # [TESTING] Disabled until basic tuning is done
+        kd=0.01,  # [TESTING] Very light damping
+        output_min=RC_TEST_MIN,   # 1450
+        output_max=RC_TEST_MAX,   # 1550
+        integral_limit=25
+    )
+
+    pitch_pid = PID(
+        kp=0.04,  # [TESTING] Very gentle forward/back. Real flight: ~0.6
+        ki=0.0,
+        kd=0.01,
+        output_min=RC_TEST_MIN,
+        output_max=RC_TEST_MAX,
+        integral_limit=25
+    )
+
+    throttle_pid = PID(
+        kp=0.03,  # [TESTING] Very gentle altitude. Real flight: ~0.5
+        ki=0.0,
+        kd=0.008,
+        output_min=RC_TEST_MIN,
+        output_max=RC_TEST_MAX,
+        integral_limit=25
+    )
+
+    # ── Start MSP sender (only when not in camera-only test mode) ─────────────
+    if not TEST_CAMERA_ONLY:
+        msp = MSPSender(SERIAL_PORT, BAUD_RATE)
+        msp.start()
+        time.sleep(1)   # Allow serial port to stabilise
+    else:
+        msp = None      # msp is None throughout — all msp calls are guarded below
+        print("[MSP] TEST_CAMERA_ONLY = True — serial disabled, no commands sent to FC")
+
+    # ── Start camera + detection background thread ────────────────────────────
+    state      = SharedState()
+    stop_event = threading.Event()   # Set this to signal all threads to stop
+    vision     = threading.Thread(
+        target=perception_thread,
+        args=(state, stop_event),
+        daemon=True   # Dies automatically if main() exits unexpectedly
+    )
+    vision.start()
+
+    # ── Arm the drone (only in full flight mode) ──────────────────────────────
+    # AUX1 = 2000 → ARM  (Betaflight Modes: AUX1 high = Armed)
+    # AUX2 = 2000 → ANGLE mode (auto-levelling — drone self-levels while
+    #               Pi handles navigation direction)
+    # Throttle = RC_MIN (1000) → zero throttle while arming
+    if not TEST_CAMERA_ONLY:
+        print("[CTRL] Sending ARM + ANGLE command…")
+        msp.set_channels([RC_MID, RC_MID, RC_MIN, RC_MID,
+                          2000,   2000,   RC_MID, RC_MID])
+        time.sleep(2)   # Betaflight needs ~1–2s of sustained AUX1 high to arm
+        print("[CTRL] Armed. Follow mode active. Press Ctrl+C to disarm.")
+        print(f"[CTRL] Test limits: ±{MAX_DEFLECTION} counts | Hover throttle: {HOVER_THROTTLE}")
+    else:
+        print("[CTRL] Camera-only test mode. Move in front of camera to test detection.")
+        print("[CTRL] Watch the debug window — orange box should track you.")
+        print("[CTRL] Check eX/eY/eH values: eX=horizontal error, eY=vertical, eH=distance")
+
+    # Pre-compute frame centre — the target point all errors are measured from
+    frame_cx = FRAME_W / 2.0   # e.g. 320.0 for a 640px wide frame
+    frame_cy = FRAME_H / 2.0   # e.g. 240.0 for a 480px tall frame
+
+    fps_buf        = deque(maxlen=30)   # Rolling buffer for FPS calculation
+    last_fps_print = time.time()
+
+    try:
+        while True:
+            loop_start = time.time()
+
+            # ── Read latest detection from camera thread ───────────────────────
+            bbox, last_det, dbg_frame = state.read()
+
+            # True if no person detected for longer than DETECTION_TIMEOUT seconds
+            person_lost = (time.time() - last_det) > DETECTION_TIMEOUT
+
+            # ══ TRACKING MODE — person is visible ═════════════════════════════
+            if bbox is not None and not person_lost:
+                x, y, w, h = bbox
+
+                # Centre of bounding box in pixels
+                target_x = x + w / 2.0
+                target_y = y + h / 2.0
+
+                # ── Error calculations ─────────────────────────────────────────
+                # Each error = "how far are we from our target?"
+                # Positive/negative sign determines which direction to correct.
+
+                # YAW error: how far right (+) or left (-) the person is
+                # from the horizontal centre of the frame
+                err_yaw = target_x - frame_cx
+
+                # PITCH error: how much taller (+) or shorter (-) the bbox is
+                # vs our target height. Taller = closer = positive = back off.
+                err_pitch = h - TARGET_BB_HEIGHT
+
+                # THROTTLE error: how far above (+) or below (-) centre the person is.
+                # Screen Y increases downward, so we negate:
+                # person above centre → target_y < frame_cy → positive → climb
+                err_throttle = -(target_y - frame_cy)
+
+                # ── Feed errors through PID controllers ────────────────────────
+                # Each returns a value in [RC_TEST_MIN, RC_TEST_MAX] = [1450, 1550]
+                yaw_cmd   = yaw_pid.compute(err_yaw)
+                pitch_cmd = pitch_pid.compute(err_pitch)
+                thr_cmd   = throttle_pid.compute(err_throttle)
+
+                # ── Build RC channel values ────────────────────────────────────
+                roll_ch = RC_MID   # Roll unused — we rotate to face, not strafe
+
+                pitch_ch = int(pitch_cmd)   # Forward/back from PID
+
+                # Throttle = hover baseline + PID offset.
+                # thr_cmd is near 1500. We take how far it deviates from 1500
+                # and add that offset to HOVER_THROTTLE.
+                # E.g. thr_cmd=1520 → offset=+20 → throttle_ch = 1050+20 = 1070
+                throttle_ch = int(max(RC_MIN, min(RC_MAX,
+                                  HOVER_THROTTLE + (thr_cmd - RC_MID))))
+
+                yaw_ch = int(yaw_cmd)   # Left/right rotation from PID
+
+                # Send channels to FC (skipped in camera-only mode)
+                if not TEST_CAMERA_ONLY:
+                    # AUX1=2000 keeps Armed, AUX2=2000 keeps ANGLE mode active
+                    msp.set_channels([roll_ch, pitch_ch, throttle_ch,
+                                      yaw_ch, 2000, 2000, RC_MID, RC_MID])
+
+            # ══ SAFETY HOVER — no person detected ═════════════════════════════
+            else:
+                if person_lost:
+                    # Reset all PIDs to prevent stale integral causing a lurch
+                    # when the person comes back into view
+                    yaw_pid.reset()
+                    pitch_pid.reset()
+                    throttle_pid.reset()
+
+                # Hold position: centred sticks, fixed throttle, stay armed
+                if not TEST_CAMERA_ONLY:
+                    msp.set_channels([RC_MID, RC_MID, HOVER_THROTTLE,
+                                      RC_MID, 2000, 2000, RC_MID, RC_MID])
+
+            # ══ DEBUG OVERLAY ═════════════════════════════════════════════════
+            # Only runs when SHOW_DEBUG_WINDOW = True.
+            # Set SHOW_DEBUG_WINDOW = False when running over SSH — cv2.imshow
+            # will crash if there is no display (DISPLAY env var not set).
+            if SHOW_DEBUG_WINDOW and dbg_frame is not None:
+                draw = dbg_frame.copy()
+
+                # Green crosshair at frame centre (the drone's target point)
+                cv2.line(draw, (int(frame_cx), 0),
+                               (int(frame_cx), FRAME_H), (0, 255, 0), 1)
+                cv2.line(draw, (0, int(frame_cy)),
+                               (FRAME_W, int(frame_cy)), (0, 255, 0), 1)
+
+                # Orange bounding box + red dot at person's centre
+                if bbox is not None and not person_lost:
+                    x, y, w, h = bbox
+                    cv2.rectangle(draw, (x, y), (x+w, y+h), (0, 165, 255), 2)
+                    cv2.circle(draw, (int(x+w/2), int(y+h/2)), 5, (0, 0, 255), -1)
+
+                    # Show pixel errors above the box — key for verifying PID logic:
+                    # eX: +ve = person right of centre, -ve = left
+                    # eY: +ve = person below centre,    -ve = above
+                    # eH: +ve = too close (box too tall), -ve = too far
+                    err_x = int(target_x - frame_cx)
+                    err_y = int(target_y - frame_cy)
+                    cv2.putText(draw,
+                        f"eX:{err_x} eY:{err_y} eH:{int(h - TARGET_BB_HEIGHT)}",
+                        (x, max(0, y - 10)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
+
+                # Status label top-left
+                label = "TRACKING" if (bbox and not person_lost) else "SEARCHING…"
+                color = (0, 200, 0) if (bbox and not person_lost) else (0, 0, 255)
+                cv2.putText(draw, label, (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+
+                # Current RC channel values (shows what would be sent to FC)
+                if not TEST_CAMERA_ONLY and msp is not None:
+                    ch = msp.get_channels()
+                    ch_text = f"R:{ch[0]} P:{ch[1]} T:{ch[2]} Y:{ch[3]}"
+                else:
+                    # In camera-only mode, show the computed values anyway
+                    # so you can verify the PID outputs look sensible
+                    if bbox is not None and not person_lost:
+                        ch_text = (f"R:{RC_MID} P:{int(pitch_cmd)} "
+                                   f"T:{int(HOVER_THROTTLE+(thr_cmd-RC_MID))} "
+                                   f"Y:{int(yaw_cmd)}")
+                    else:
+                        ch_text = f"R:{RC_MID} P:{RC_MID} T:{HOVER_THROTTLE} Y:{RC_MID}"
+
+                cv2.putText(draw, ch_text,
+                    (10, FRAME_H - 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1)
+
+                # Mode indicator at the bottom so it's always visible
+                mode_label = "[CAMERA TEST — no commands sent]" if TEST_CAMERA_ONLY else f"[FLIGHT MODE] ±{MAX_DEFLECTION}"
+                mode_color = (0, 200, 255) if TEST_CAMERA_ONLY else (0, 255, 0)
+                cv2.putText(draw, mode_label,
+                    (10, FRAME_H - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, mode_color, 1)
+
+                cv2.imshow("Drone Follow", draw)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break   # Q key exits cleanly
+
+            # ── FPS + status logging to terminal (every 2 seconds) ────────────
+            fps_buf.append(time.time() - loop_start)
+            if time.time() - last_fps_print > 2.0:
+                avg    = len(fps_buf) / sum(fps_buf) if fps_buf else 0
+                status = 'TRACKING' if (bbox and not person_lost) else 'LOST'
+                if not TEST_CAMERA_ONLY and msp is not None:
+                    ch = msp.get_channels()
+                    print(f"[CTRL] FPS≈{avg:.1f} | "
+                          f"R:{ch[0]} P:{ch[1]} T:{ch[2]} Y:{ch[3]} | {status}")
+                else:
+                    print(f"[CTRL] FPS≈{avg:.1f} | CAMERA TEST MODE | {status}")
+                last_fps_print = time.time()
+
+            # ── Loop timing: target 50 Hz ──────────────────────────────────────
+            # Sleep only the remaining time so we don't over-spin the CPU
+            elapsed = time.time() - loop_start
+            if elapsed < 0.02:
+                time.sleep(0.02 - elapsed)
+
+    except KeyboardInterrupt:
+        print("\n[!] Ctrl+C — Emergency stop triggered")
+
+    finally:
+        # ── Shutdown sequence — always runs even if an exception occurs ────────
+        # Order matters: stop camera first, then disarm FC, then close serial.
+        stop_event.set()        # Signal camera thread to exit its loop
+
+        if not TEST_CAMERA_ONLY and msp is not None:
+            print("[CTRL] Disarming…")
+            msp.disarm()        # Blast 20 disarm packets directly to FC
+            msp.stop()          # Stop heartbeat thread + close serial port
+
+        vision.join(timeout=3)  # Wait for camera thread to finish cleanly
+        cv2.destroyAllWindows() # Close the debug window
+        print("[CTRL] Shutdown complete. Safe to power off.")
+
+
+# ── Entry point ───────────────────────────────────────────────────────────────
+# Only runs main() when this file is executed directly (not when imported).
+if __name__ == '__main__':
+    main()
