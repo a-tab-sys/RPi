@@ -95,3 +95,27 @@ CAMPUS-AIR                740c7543-30aa-45e0-8e41-132cc8f6151f  wifi      --
 ic3StatZebraAssoc         43552f8c-056d-43a7-878f-0f2adcb8fbf7  wifi      --     
 netplan-eth0              75a1216a-9d1a-30cd-8aca-ace5526ec021  ethernet  --     
 netplan-wlan0-CAMPUS-AIR  67657f6f-d274-355b-91f2-e31fc9ebb64c  wifi      --   
+
+
+///////////////////////
+atab-rpi@atab-rpi:~ $ sudo nmcli con delete 3ad9fabc-0ed8-48b2-9197-02fc472bd04b
+Connection 'Atab-rpi' (3ad9fabc-0ed8-48b2-9197-02fc472bd04b) successfully deleted.
+atab-rpi@atab-rpi:~ $ nmcli con show
+NAME                      UUID                                  TYPE      DEVICE 
+eduroam                   e3482555-cb08-4c17-a077-c404040cabc2  wifi      wlan0  
+lo                        c933ebe0-ef67-45fd-b9e9-68261519c5a0  loopback  lo     
+ACE_Guest                 d51c4c5e-7937-4bec-9fef-506ade024633  wifi      --     
+Atab-rpi                  15b2e000-1608-410d-a497-6dfa28f10aaf  wifi      --     
+CAMPUS-AIR                740c7543-30aa-45e0-8e41-132cc8f6151f  wifi      --     
+ic3StatZebraAssoc         43552f8c-056d-43a7-878f-0f2adcb8fbf7  wifi      --     
+netplan-eth0              75a1216a-9d1a-30cd-8aca-ace5526ec021  ethernet  --     
+netplan-wlan0-CAMPUS-AIR  67657f6f-d274-355b-91f2-e31fc9ebb64c  wifi      --     
+atab-rpi@atab-rpi:~ $ sudo nmcli con down eduroam && sudo nmcli con up 15b2e000-1608-410d-a497-6dfa28f10aaf
+Connection 'eduroam' successfully deactivated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/15)
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/16)
+atab-rpi@atab-rpi:~ $ nmcli con show --active
+NAME      UUID                                  TYPE      DEVICE 
+Atab-rpi  15b2e000-1608-410d-a497-6dfa28f10aaf  wifi      wlan0  
+lo        c933ebe0-ef67-45fd-b9e9-68261519c5a0  loopback  lo     
+atab-rpi@atab-rpi:~ $ 
+
