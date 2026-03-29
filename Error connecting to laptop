@@ -42,3 +42,11 @@ Error: 802-11-wireless-security.key-mgmt: property is missing.
 atab-rpi@atab-rpi:~ $ sudo nmcli dev wifi connect "Atab-rpi" password "Atab-rpi"
 Error: 802-11-wireless-security.key-mgmt: property is missing.
 atab-rpi@atab-rpi:~ $ ^C
+
+
+/////////////////////////////////
+sudo nmcli dev wifi connect "Atab-rpi" password "Atab-rpi" -- 802-11-wireless-security.key-mgmt wpa-psk
+
+sudo nmcli con add type wifi ifname wlan0 con-name "Atab-rpi" ssid "Atab-rpi" \
+  wifi-sec.key-mgmt wpa-psk wifi-sec.psk "Atab-rpi" \
+  && sudo nmcli con up "Atab-rpi"
