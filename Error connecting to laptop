@@ -129,3 +129,12 @@ atab-rpi@atab-rpi:~ $ hostname -I
 atab-rpi@atab-rpi:~ $ ip route | grep default
 default via 10.154.59.17 dev wlan0 proto dhcp src 10.154.59.173 metric 600 
 
+//////////////////////////////////
+sudo nmcli con mod "Atab-rpi" ipv4.addresses 10.154.59.100/24
+sudo nmcli con mod "Atab-rpi" ipv4.gateway 10.154.59.17
+sudo nmcli con mod "Atab-rpi" ipv4.dns "8.8.8.8"
+sudo nmcli con mod "Atab-rpi" ipv4.method manual
+
+sudo nmcli con down "Atab-rpi" && sudo nmcli con up "Atab-rpi"
+
+hostname -I
